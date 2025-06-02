@@ -1,0 +1,175 @@
+.example-container {
+  max-width: 50%;
+  margin: 2% auto;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  border: 2px solid #C1C1C1;
+  border-radius: 15px;
+}
+
+.header-section {
+  grid-column: 1 / -1;
+  text-align: left;
+  margin-bottom: 20px;
+  
+  .google-logo {
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0;
+  }
+}
+
+form {
+  grid-column: 1;
+}
+
+.side-image {
+  grid-column: 2;
+  text-align: center;
+  
+  .products-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .tagline {
+    margin-top: 20px;
+    color: #5f6368;
+    font-size: 16px;
+  }
+}
+
+.name-row,
+.password-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.username-row,
+.checkbox-row {
+  margin-bottom: 20px;
+}
+
+.email-link {
+  margin-bottom: 30px;
+  
+  a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 14px;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-hint {
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.submit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  
+  .sign-in {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  button {
+    min-width: 80px;
+    height: 36px;
+    border-radius: 4px;
+  }
+}
+
+.checkbox-row {
+  mat-checkbox {
+    font-size: 14px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .example-container {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    padding: 20px;
+    margin: 5% auto;
+  }
+  
+  .header-section {
+    text-align: center;
+  }
+  
+  form {
+    grid-column: 1;
+  }
+  
+  .side-image {
+    grid-column: 1;
+    order: -1;
+    margin-bottom: 20px;
+  }
+  
+  .name-row,
+  .password-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .submit-row {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    
+    .sign-in-link {
+      order: 2;
+    }
+    
+    button {
+      order: 1;
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .example-container {
+    margin: 10px;
+    padding: 16px;
+  }
+  
+  .header-section h2 {
+    font-size: 20px;
+  }
+}
