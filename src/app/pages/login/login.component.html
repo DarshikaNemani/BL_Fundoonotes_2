@@ -1,1 +1,41 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="header-section">
+    <img src="assets/Google_2015_logo.svg.webp" alt="Google" class="google-logo">
+    <h2>Login</h2>
+    <h4>Use your Google Account</h4>
+  </div>
+  
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="email-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email or phone</mat-label>
+        <input matInput formControlName="email" type="email">
+        <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          <span *ngIf="loginForm.get('email')?.hasError('required')">Email or phone is required</span>
+          <span *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</span>
+        </mat-error>
+      </mat-form-field> 
+    </div>
+    
+    <div class="password-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hide() ? 'password' : 'text'" formControlName="password" />
+        <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Password is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <div class="forget-password">
+      <a href="">Forgot Password?</a>
+    </div>
+    
+    <div class="submit-row">
+      <a href="http://localhost:4200/register" class="create-account">Create account</a>
+      <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+        Login
+      </button>
+    </div>
+  </form>
+</div>

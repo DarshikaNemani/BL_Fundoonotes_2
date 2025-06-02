@@ -1,0 +1,131 @@
+.login-container {
+  max-width: 25%;
+  margin: 5% auto;
+  padding: 6% 5%;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: white;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  .google-logo {
+    height: 40px;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0 0 8px 0;
+  }
+  
+  h4 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #5f6368;
+    margin: 0;
+  }
+}
+
+form {
+  width: 100%;
+}
+
+.email-row,
+.password-row {
+  margin-bottom: 24px;
+  
+  .full-width {
+    width: 100%;
+  }
+}
+
+.forget-password {
+  margin-bottom: 32px;
+  
+  a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.submit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .create-account {
+    color: #1a73e8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  button {
+    min-width: 80px;
+    height: 36px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+}
+
+.password-row mat-form-field {
+  .mat-mdc-form-field-subscript-wrapper {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    margin: 20px;
+    padding: 24px 20px;
+    max-width: none;
+  }
+  
+  .header-section {
+    margin-bottom: 24px;
+    
+    h2 {
+      font-size: 20px;
+    }
+    
+    h4 {
+      font-size: 14px;
+    }
+  }
+  
+  .submit-row {
+    flex-direction: column;
+    gap: 16px;
+    
+    .create-account {
+      order: 2;
+    }
+    
+    button {
+      order: 1;
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .login-container {
+    margin: 10px;
+    padding: 20px 16px;
+  }
+}
