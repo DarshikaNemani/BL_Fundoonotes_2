@@ -118,7 +118,6 @@ mat-hint {
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
   .example-container {
     grid-template-columns: 1fr;
@@ -136,9 +135,7 @@ mat-hint {
   }
   
   .side-image {
-    grid-column: 1;
-    order: -1;
-    margin-bottom: 20px;
+    display: none;
   }
   
   .name-row,
@@ -172,4 +169,8 @@ mat-hint {
   .header-section h2 {
     font-size: 20px;
   }
+}
+
+mat-error{
+  font-size: x-small;
 }
