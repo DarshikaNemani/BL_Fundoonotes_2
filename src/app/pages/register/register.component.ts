@@ -50,11 +50,10 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
       password: ['', [Validators.required, Validators.pattern(this.passwordRegex)]],
       confirmPassword: ['', Validators.required],
-      service: ['advance'] // Default service type for FundooNotes
+      service: ['advance']
     }, { validators: this.passwordMatchValidator });
   }
 
-  // Custom validator for password matching
   passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
@@ -74,7 +73,6 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.isLoading.set(true);
       
-      // Prepare payload for FundooNotes API
       const payload = {
         firstName: this.registerForm.value.firstName,
         lastName: this.registerForm.value.lastName,
@@ -94,7 +92,6 @@ export class RegisterComponent {
             verticalPosition: 'top',
           });
           
-          // Navigate to login page
           this.router.navigateByUrl('/login');
         },
         error: (err: any) => {
@@ -119,13 +116,11 @@ export class RegisterComponent {
     }
   }
 
-  // Helper method to check if passwords don't match
   get passwordMismatch() {
     return this.registerForm.hasError('passwordMismatch') && 
            this.registerForm.get('confirmPassword')?.touched;
   }
 
-  // Getter methods for form validation errors
   get firstNameError() {
     const control = this.registerForm.get('firstName');
     if (control?.hasError('required')) return 'First name is required';

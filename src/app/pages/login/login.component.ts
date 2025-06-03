@@ -65,8 +65,7 @@ export class LoginComponent {
         next: (result: any) => {
           console.log('Login successful:', result);
           this.isLoading.set(false);
-          
-          // Store auth token and user data
+
           if (result.data) {
             localStorage.setItem('authToken', result.data);
             if (result.userData) {
@@ -80,7 +79,6 @@ export class LoginComponent {
             verticalPosition: 'top',
           });
           
-          // Navigate to dashboard/notes
           this.router.navigateByUrl('/dashboard/notes');
         },
         error: (err: any) => {
@@ -105,7 +103,6 @@ export class LoginComponent {
     }
   }
 
-  // Getter methods for form validation errors
   get emailError() {
     const control = this.loginForm.get('email');
     if (control?.hasError('required')) return 'Email is required';
