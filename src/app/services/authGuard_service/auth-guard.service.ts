@@ -12,7 +12,7 @@ export class AuthGuardService {
       console.log(localStorage.getItem('authToken'))
       return true;
     } else {
-      this.router.navigate(['']);
+      this.router.navigate(['/login']);
       return false;
     }
   }

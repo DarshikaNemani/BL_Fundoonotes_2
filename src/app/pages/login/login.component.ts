@@ -43,7 +43,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
       password: ['', Validators.required],
-      service: ['advance'] // Default service type for FundooNotes
+      service: ['advance']
     });
   }
 
@@ -66,11 +66,11 @@ export class LoginComponent {
           console.log('Login successful:', result);
           this.isLoading.set(false);
 
-          if (result.data) {
-            localStorage.setItem('authToken', result.data);
-            if (result.userData) {
-              localStorage.setItem('userData', JSON.stringify(result.userData));
-            }
+          if (result.id) {
+            localStorage.setItem('authToken', result.id);
+            if (result) {
+              localStorage.setItem('userData', JSON.stringify(result));
+            } 
           }
           
           this.snackBar.open('Login successful!', 'Close', {
@@ -79,7 +79,7 @@ export class LoginComponent {
             verticalPosition: 'top',
           });
           
-          this.router.navigateByUrl('/dashboard/notes');
+          this.router.navigateByUrl('')
         },
         error: (err: any) => {
           console.error('Login failed:', err);
