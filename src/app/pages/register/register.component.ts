@@ -33,7 +33,6 @@ export class RegisterComponent {
   registerForm: FormGroup;
   isLoading = signal(false);
 
-  // Regex patterns
   private emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   private nameRegex = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
   private passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;

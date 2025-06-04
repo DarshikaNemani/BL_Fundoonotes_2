@@ -31,7 +31,6 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = signal(false);
 
-  // Regex patterns
   private emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   constructor(
