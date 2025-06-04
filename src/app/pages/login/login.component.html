@@ -8,10 +8,10 @@
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="email-row">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Email or phone</mat-label>
+        <mat-label>Email</mat-label>
         <input matInput formControlName="email" type="email">
         <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          <span *ngIf="loginForm.get('email')?.hasError('required')">Email or phone is required</span>
+          <span *ngIf="loginForm.get('email')?.hasError('required')">Email is required</span>
           <span *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</span>
         </mat-error>
       </mat-form-field> 
@@ -32,7 +32,7 @@
     </div>
     
     <div class="submit-row">
-      <a href="http://localhost:4200/register" class="create-account">Create account</a>
+      <a href="/register" class="create-account">Create account</a>
       <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
         Login
       </button>
