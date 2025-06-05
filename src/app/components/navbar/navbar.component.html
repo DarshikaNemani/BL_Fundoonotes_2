@@ -1,27 +1,45 @@
-<!-- src/app/components/navbar/navbar.component.html -->
-<mat-toolbar>
-  <button mat-icon-button (click)="onMenuClick()" aria-label="Menu">
+<mat-toolbar class="navbar-toolbar">
+  <button mat-icon-button (click)="onToggleSidenav()" aria-label="Menu">
     <mat-icon>menu</mat-icon>
   </button>
-  <img src="assets/images-keep.png" alt="FundooNotes Logo" class="logo">
-  <span>FundooNotes</span>
-  <span class="example-spacer"></span>
-  <button mat-icon-button aria-label="Search">
-    <mat-icon>search</mat-icon>
-  </button>
-  <mat-form-field appearance="outline" class="search-field">
-    <input matInput placeholder="Search" class="example-input">
-  </mat-form-field>
-  <button mat-icon-button aria-label="Refresh">
-    <mat-icon>refresh</mat-icon>
-  </button>
-  <button mat-icon-button aria-label="List View">
-    <mat-icon>view_list</mat-icon>
-  </button>
-  <button mat-icon-button aria-label="Settings">
-    <mat-icon>settings</mat-icon>
-  </button>
-  <button class="icon-btn" (click)="onLogout()" aria-label="Logout">
-    Logout
-  </button>
+  
+  <div class="navbar-brand">
+    <img src="assets/images-keep.png" alt="Keep Logo" class="navbar-logo" />
+    <span class="navbar-title">Fundoonotes</span>
+  </div>
+
+  <div class="navbar-search">
+    <div class="search-container">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input type="text" placeholder="Search" class="search-input">
+    </div>
+  </div>
+
+  <span class="navbar-spacer"></span>
+
+  <div class="navbar-actions">
+    <button mat-icon-button aria-label="Refresh">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    
+    <button mat-icon-button aria-label="List View">
+      <mat-icon>view_list</mat-icon>
+    </button>
+    
+    <button mat-icon-button aria-label="Settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+
+    <button mat-icon-button aria-label="Apps">
+      <mat-icon>apps</mat-icon>
+    </button>
+
+    <button mat-icon-button aria-label="Account">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="onLogout()" aria-label="Logout" class="logout-btn">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
