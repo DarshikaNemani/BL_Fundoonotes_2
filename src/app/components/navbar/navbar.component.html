@@ -1,1 +1,27 @@
-<p>navbar works!</p>
+<!-- src/app/components/navbar/navbar.component.html -->
+<mat-toolbar>
+  <button mat-icon-button (click)="onMenuClick()" aria-label="Menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <img src="assets/images-keep.png" alt="FundooNotes Logo" class="logo">
+  <span>FundooNotes</span>
+  <span class="example-spacer"></span>
+  <button mat-icon-button aria-label="Search">
+    <mat-icon>search</mat-icon>
+  </button>
+  <mat-form-field appearance="outline" class="search-field">
+    <input matInput placeholder="Search" class="example-input">
+  </mat-form-field>
+  <button mat-icon-button aria-label="Refresh">
+    <mat-icon>refresh</mat-icon>
+  </button>
+  <button mat-icon-button aria-label="List View">
+    <mat-icon>view_list</mat-icon>
+  </button>
+  <button mat-icon-button aria-label="Settings">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <button class="icon-btn" (click)="onLogout()" aria-label="Logout">
+    Logout
+  </button>
+</mat-toolbar>
