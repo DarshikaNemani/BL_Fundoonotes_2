@@ -1,0 +1,58 @@
+  <app-navbar 
+    (toggleSidenav)="toggleSidenavCollapse()" 
+    (logout)="logout()">
+  </app-navbar>
+
+  <mat-drawer-container #drawerContainer class="example-container" autosize>
+    <mat-drawer #drawer 
+                class="example-sidenav" 
+                mode="side" 
+                [opened]="true"
+                [style.width]="sidenavWidth">
+      <app-sidenav [isExpanded]="!sidenavCollapsed"></app-sidenav>
+    </mat-drawer>
+<div class="trash-container">
+  <div class="trash-header">
+    <p class="trash-notice">Notes in Trash are deleted after 7 days.</p>
+  </div>
+  
+  
+  <div class="trash-content">
+    <!-- Trash notes grid -->
+    <div class="notes-container" *ngIf="trashedNotes.length > 0">
+      <div class="notes-masonry">
+        <div *ngFor="let note of trashedNotes; trackBy: trackByNoteId" 
+             class="note-card" 
+             (click)="onNoteClick(note)">
+          
+          <div class="note-content">
+            <div class="note-body">
+              <div class="note-title" *ngIf="note.title">{{ note.title }}</div>
+              <div class="note-description" *ngIf="note.description">{{ note.description }}</div>
+            </div>
+            
+            <div class="note-actions-bottom">
+              <button mat-icon-button class="action-btn" aria-label="Restore" (click)="onRestoreNote(note.id); $event.stopPropagation()">
+                <mat-icon>restore_from_trash</mat-icon>
+              </button>
+              <button mat-icon-button class="action-btn" aria-label="Delete forever" (click)="onDeleteForever(note.id); $event.stopPropagation()">
+                <mat-icon>delete_forever</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="trashedNotes.length === 0 && !isLoading">
+      <mat-icon class="empty-icon">delete</mat-icon>
+      <p class="empty-message">No notes in Trash</p>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  </div>
+</div>
