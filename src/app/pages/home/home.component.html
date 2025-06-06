@@ -1,37 +1,20 @@
-<mat-toolbar>
-  <button mat-icon-button (click)="drawer.toggle()" aria-label="Menu">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <img src="assets/images-keep.png" alt="FundooNotes Logo" class="logo">
-  <span>FundooNotes</span>
-  <button mat-icon-button aria-label="Search">
-    <mat-icon>search</mat-icon>
-  </button>
-  <mat-form-field appearance="outline" class="search-field">
-    <input matInput placeholder="Search" class="example-input">
-  </mat-form-field>
-  <span class="example-spacer"></span>
-  <button mat-icon-button aria-label="Refresh">
-    <mat-icon>refresh</mat-icon>
-  </button>
-  <button mat-icon-button aria-label="List View">
-    <mat-icon>view_list</mat-icon>
-  </button>
-  <button mat-icon-button aria-label="Settings">
-    <mat-icon>settings</mat-icon>
-  </button>
-  <button class="icon-btn" (click)="logout()" aria-label="Logout">
-    Logout
-  </button>
-</mat-toolbar>
+<div class="home-layout">
+  <app-navbar 
+    (toggleSidenav)="toggleSidenavCollapse()" 
+    (logout)="logout()">
+  </app-navbar>
 
-<mat-drawer-container class="example-container" autosize>
-  <mat-drawer #drawer class="example-sidenav" mode="side">
-    <a href="">Notes</a>
-    <a href="">Reminders</a>
-    <a href="">Edit Labels</a>
-    <a href="">Archive</a>
-    <a href="">Trash</a>
-  </mat-drawer>
-  
-</mat-drawer-container>
+  <mat-drawer-container #drawerContainer class="example-container" autosize>
+    <mat-drawer #drawer 
+                class="example-sidenav" 
+                mode="side" 
+                [opened]="true"
+                [style.width]="sidenavWidth">
+      <app-sidenav [isExpanded]="!sidenavCollapsed"></app-sidenav>
+    </mat-drawer>
+    
+    <mat-drawer-content class="example-sidenav-content">
+      <app-notes></app-notes>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>
