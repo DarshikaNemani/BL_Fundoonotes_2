@@ -126,13 +126,6 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.showMoreMenu = false;
   }
 
-  toggleMoreMenu(event: Event, note: Note) {
-    event.stopPropagation();
-    this.selectedNoteForMenu = note;
-    this.showMoreMenu = !this.showMoreMenu;
-    this.showFormColorPicker = false;
-    this.showNoteColorPicker = false;
-  }
 
   selectFormColor(color: string) {
     this.selectedFormColor = color;
