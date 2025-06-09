@@ -5,6 +5,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { ArchiveComponent } from './pages/archive/archive.component';
 import { TrashComponent } from './pages/trash/trash.component';
 import { AuthGuardService } from './services/authGuard_service/auth-guard.service';
+import { NotesComponent } from './components/notes/notes.component';
 
 export const routes: Routes = [
   {
@@ -16,23 +17,24 @@ export const routes: Routes = [
     component: LoginComponent,
   },
   {
-    path: 'notes',
+    path: 'dashboard',
     component: HomeComponent,
     canActivate: [AuthGuardService],
-  },
-  {
-    path: 'archive',
-    component: ArchiveComponent,
-    canActivate: [AuthGuardService],
-  },
-  {
-    path: 'trash',
-    component: TrashComponent,
-    canActivate: [AuthGuardService],
+    children: [
+      { path: '', component: NotesComponent },
+      {
+        path: 'archive',
+        component: ArchiveComponent,
+      },
+      {
+        path: 'trash',
+        component: TrashComponent,
+      },
+    ],
   },
   {
     path: '',
-    redirectTo: '/notes',
-    pathMatch: 'full'
+    redirectTo: '/login',
+    pathMatch: 'full',
   },
 ];
