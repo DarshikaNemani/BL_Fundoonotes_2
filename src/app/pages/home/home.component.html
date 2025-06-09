@@ -1,20 +1,14 @@
 <div class="home-layout">
-  <app-navbar 
-    (toggleSidenav)="toggleSidenavCollapse()" 
-    (logout)="logout()">
+  <app-navbar (toggleSidenav)="toggleSidenavCollapse()" (logout)="logout()">
   </app-navbar>
 
   <mat-drawer-container #drawerContainer class="example-container" autosize>
-    <mat-drawer #drawer 
-                class="example-sidenav" 
-                mode="side" 
-                [opened]="true"
-                [style.width]="sidenavWidth">
+    <mat-drawer #drawer class="example-sidenav" mode="side" [opened]="true" [style.width]="sidenavWidth">
       <app-sidenav [isExpanded]="!sidenavCollapsed"></app-sidenav>
     </mat-drawer>
-    
+
     <mat-drawer-content class="example-sidenav-content">
-      <app-notes></app-notes>
+      <router-outlet></router-outlet>
     </mat-drawer-content>
   </mat-drawer-container>
 </div>

@@ -1,36 +1,25 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatDrawerContainer } from '@angular/material/sidenav';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDrawerContainer, MatSidenavModule } from '@angular/material/sidenav';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { SidenavComponent } from '../../components/sidenav/sidenav.component';
-import { NotesComponent } from '../../components/notes/notes.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatSidenavModule,
-    NavbarComponent,
-    SidenavComponent,
-    NotesComponent
-  ],
+  imports: [ CommonModule,MatSidenavModule, NavbarComponent, SidenavComponent, RouterOutlet ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements AfterViewInit {
   @ViewChild('drawerContainer') drawerContainer!: MatDrawerContainer;
-  
   sidenavCollapsed = false;
 
   constructor(private router: Router) {}
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.drawerContainer?.updateContentMargins();
-    }, 0);
+    setTimeout(() => this.drawerContainer?.updateContentMargins(), 0);
   }
 
   get sidenavWidth() {
@@ -39,10 +28,7 @@ export class HomeComponent implements AfterViewInit {
 
   toggleSidenavCollapse() {
     this.sidenavCollapsed = !this.sidenavCollapsed;
-    
-    setTimeout(() => {
-      this.drawerContainer?.updateContentMargins();
-    }, 300);
+    setTimeout(() => this.drawerContainer?.updateContentMargins(), 300);
   }
 
   logout() {
