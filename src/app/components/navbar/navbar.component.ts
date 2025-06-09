@@ -7,14 +7,9 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, MatToolbarModule, MatIconModule, MatButtonModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
   @Output() toggleSidenav = new EventEmitter<void>();
@@ -27,5 +22,7 @@ export class NavbarComponent {
   onLogout() {
     this.logout.emit();
   }
+  refreshPage() {
+    location.reload();
+  }
 }
-  
