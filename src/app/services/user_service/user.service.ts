@@ -1,37 +1,48 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from '../http_service/http.service';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-  constructor(private httpService: HttpService) { }
+  constructor(private httpService: HttpService, private router: Router) {}
 
-  // Register user
-  signup(payload: any): Observable<any> {
+  signup(payload: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    service: string;
+  }): Observable<any> {
     return this.httpService.postApi('/user/userSignup', payload);
   }
 
-  // Login user  
-  signIn(payload: any): Observable<any> {
+  signIn(payload: {
+    email: string;
+    password: string;
+    service: string;
+  }): Observable<any> {
     return this.httpService.postApi('/user/login', payload);
   }
 
-  // Logout user
   logout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    localStorage.clear();
+    this.router.navigate(['/login']);
   }
 
-  // Check if user is logged in
   isLoggedIn(): boolean {
     return !!localStorage.getItem('authToken');
   }
 
-  // Get user data
   getUserData(): any {
     const userData = localStorage.getItem('userData');
     return userData ? JSON.parse(userData) : null;
+  }
+
+  setAuthData(token: string, userData: any): void {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('userData', JSON.stringify(userData));
   }
 }
