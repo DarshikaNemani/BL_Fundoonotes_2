@@ -7,39 +7,34 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [
-    CommonModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    RouterModule
-  ],
+  imports: [CommonModule, MatButtonModule, MatIconModule, RouterModule],
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
 })
 export class SidenavComponent {
   @Input() isExpanded: boolean = false;
   selectedLabel: string = '';
-  hoverLabel: string = '';
+  isHovering: boolean = false; // Changed from hoverLabel to boolean
 
   navItems = [
-    { icon: 'lightbulb', label: 'Notes', route: '/notes' },
+    { icon: 'lightbulb', label: 'Notes', route: '/dashboard' },
     { icon: 'notifications', label: 'Reminders', route: '/reminders' },
     { icon: 'edit', label: 'Edit labels', route: '/edit-labels' },
-    { icon: 'archive', label: 'Archive', route: '/archive' },
-    { icon: 'delete', label: 'Trash', route: '/trash' },
+    { icon: 'archive', label: 'Archive', route: '/dashboard/archive' },
+    { icon: 'delete', label: 'Trash', route: '/dashboard/trash' },
   ];
 
   select(label: string) {
     this.selectedLabel = label;
   }
 
-  setHover(label: string) {
+  setHover() {
     if (!this.isExpanded) {
-      this.hoverLabel = label;
+      this.isHovering = true;
     }
   }
 
   clearHover() {
-    this.hoverLabel = '';
+    this.isHovering = false;
   }
 }
