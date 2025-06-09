@@ -1,14 +1,10 @@
-<!-- Take a note form -->
+<!-- Create note -->
 <div class="note-form-container">
   <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" class="note-form" [style.background-color]="selectedFormColor">
     <div class="form-input-row" *ngIf="!isExpanded">
-      <input 
-        formControlName="description" 
-        placeholder="Take a note..." 
-        class="note-input"
-        type="text"
+      <input formControlName="description" placeholder="Take a note..." class="note-input" type="text"
         (focus)="expandForm()">
-      
+
       <div class="form-icons">
         <button type="button" mat-icon-button aria-label="New list">
           <mat-icon>check_box</mat-icon>
@@ -21,21 +17,13 @@
         </button>
       </div>
     </div>
-    
+
     <div *ngIf="isExpanded" class="expanded-form">
-      <input 
-        formControlName="title" 
-        placeholder="Title" 
-        class="note-title-input"
-        type="text">
-      
-      <textarea 
-        formControlName="description" 
-        placeholder="Take a note..." 
-        class="note-textarea"
-        rows="3"
+      <input formControlName="title" placeholder="Title" class="note-title-input" type="text">
+
+      <textarea formControlName="description" placeholder="Take a note..." class="note-textarea" rows="3"
         (blur)="onInputBlur()"></textarea>
-      
+
       <div class="form-footer">
         <div class="form-actions">
           <button type="button" mat-icon-button aria-label="Remind me">
@@ -53,60 +41,39 @@
           <button type="button" mat-icon-button aria-label="Archive">
             <mat-icon>archive</mat-icon>
           </button>
-          <button type="button" mat-icon-button aria-label="More">
-            <mat-icon>more_vert</mat-icon>
-          </button>
         </div>
-        <button type="submit" 
-                mat-button 
-                class="close-btn"
-                [disabled]="!noteForm.value.title?.trim() && !noteForm.value.description?.trim()">
+        <button type="submit" mat-button class="close-btn"
+          [disabled]="!noteForm.value.title?.trim() && !noteForm.value.description?.trim()">
           Close
         </button>
       </div>
     </div>
   </form>
 
-  <!-- Form Color Picker - Below the form -->
+  <!-- Color Picker -->
   <div class="color-picker-popup form-color-picker" *ngIf="showFormColorPicker" (click)="$event.stopPropagation()">
     <div class="color-grid">
-      <div class="color-option default-color" 
-           (click)="selectFormColor('#ffffff')"
-           [class.selected]="selectedFormColor === '#ffffff'">
+      <div class="color-option default-color" (click)="selectFormColor('#ffffff')"
+        [class.selected]="selectedFormColor === '#ffffff'">
         <mat-icon>format_color_reset</mat-icon>
       </div>
-      
-      <div *ngFor="let color of solidColors" 
-           class="color-option" 
-           [style.background-color]="color"
-           (click)="selectFormColor(color)"
-           [class.selected]="selectedFormColor === color">
-      </div>
-    </div>
-    
-    <div class="color-grid">
-      <div class="color-option default-pattern" 
-           (click)="selectFormColor('#ffffff')"
-           [class.selected]="selectedFormColor === '#ffffff'">
-        <mat-icon>texture</mat-icon>
+
+      <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
+        (click)="selectFormColor(color)" [class.selected]="selectedFormColor === color">
       </div>
     </div>
   </div>
 </div>
 
 <!-- Notes grid -->
-<div class="notes-container" *ngIf="notes.length > 0">
+<div class="notes-container" *ngIf="activeNotes.length > 0">
   <div class="notes-masonry">
-    <div *ngFor="let note of notes; trackBy: trackByNoteId" 
-         class="note-card-wrapper"
-         [class.has-color-picker]="showNoteColorPicker && selectedNoteForColor?.id === note.id">
-      
-      <div class="note-card" 
-           [class.editing]="isEditing && editNoteId === note.id"
-           [style.background-color]="note.color || '#ffffff'"
-           (click)="onNoteClick(note)">
-        
-        <!-- Display mode -->
+    <div *ngFor="let note of activeNotes; trackBy: trackByNoteId" class="note-card-wrapper"
+      [class.has-color-picker]="showNoteColorPicker && selectedNoteForColor?.id === note.id">
+
+      <div class="note-card" [class.editing]="isEditing && editNoteId === note.id"
+        [style.background-color]="note.color || '#ffffff'" (click)="onNoteClick(note)">
+
         <div *ngIf="!(isEditing && editNoteId === note.id)" class="note-content">
           <div class="note-body">
             <div class="note-header" *ngIf="note.title">
@@ -116,7 +83,7 @@
               {{ note.description }}
             </div>
           </div>
-          
+
           <div class="note-actions-bottom">
             <button mat-icon-button class="action-btn" aria-label="Remind me" (click)="$event.stopPropagation()">
               <mat-icon>add_alert</mat-icon>
@@ -124,40 +91,33 @@
             <button mat-icon-button class="action-btn" aria-label="Collaborator" (click)="$event.stopPropagation()">
               <mat-icon>person_add</mat-icon>
             </button>
-            <button mat-icon-button class="action-btn" aria-label="Color options" (click)="toggleNoteColorPicker($event, note)">
+            <button mat-icon-button class="action-btn" aria-label="Color options"
+              (click)="toggleNoteColorPicker($event, note)">
               <mat-icon>palette</mat-icon>
             </button>
             <button mat-icon-button class="action-btn" aria-label="Add image" (click)="$event.stopPropagation()">
               <mat-icon>image</mat-icon>
             </button>
-            <button mat-icon-button class="action-btn" aria-label="Archive" (click)="$event.stopPropagation()">
+            <button mat-icon-button class="action-btn" aria-label="Archive"
+              (click)="onArchiveNote(note.id!); $event.stopPropagation()">
               <mat-icon>archive</mat-icon>
             </button>
-            <button mat-icon-button class="action-btn" aria-label="More" (click)="toggleMoreMenu($event, note)">
-              <mat-icon>more_vert</mat-icon>
+            <button mat-icon-button class="action-btn" aria-label="Delete note"
+              (click)="onDeleteNote(note.id); $event.stopPropagation()">
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
-        
-        <!-- Edit mode -->
+
         <div *ngIf="isEditing && editNoteId === note.id" class="edit-content" (click)="$event.stopPropagation()">
           <div class="edit-body">
-            <input 
-              [(ngModel)]="editTitle" 
-              placeholder="Title" 
-              class="edit-title-input"
-              type="text"
-              (keydown.enter)="onSaveNote(note.id)"
-              (keydown.escape)="onCancelEdit()">
-            
-            <textarea 
-              [(ngModel)]="editDescription" 
-              placeholder="Take a note..." 
-              class="edit-description-textarea"
-              rows="4"
-              (keydown.escape)="onCancelEdit()"></textarea>
+            <input [(ngModel)]="editTitle" placeholder="Title" class="edit-title-input" type="text"
+              (keydown.enter)="onSaveNote(note.id)" (keydown.escape)="onCancelEdit()">
+
+            <textarea [(ngModel)]="editDescription" placeholder="Take a note..." class="edit-description-textarea"
+              rows="4" (keydown.escape)="onCancelEdit()"></textarea>
           </div>
-          
+
           <div class="edit-actions-bottom">
             <div class="edit-action-buttons">
               <button type="button" mat-icon-button aria-label="Remind me">
@@ -166,17 +126,18 @@
               <button type="button" mat-icon-button aria-label="Collaborator">
                 <mat-icon>person_add</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="Color options" (click)="toggleNoteColorPicker($event, note)">
+              <button type="button" mat-icon-button aria-label="Color options"
+                (click)="toggleNoteColorPicker($event, note)">
                 <mat-icon>palette</mat-icon>
               </button>
               <button type="button" mat-icon-button aria-label="Add image">
                 <mat-icon>image</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="Archive">
+              <button type="button" mat-icon-button aria-label="Archive" (click)="onArchiveNote(note.id!)">
                 <mat-icon>archive</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="More" (click)="toggleMoreMenu($event, note)">
-                <mat-icon>more_vert</mat-icon>
+              <button type="button" mat-icon-button aria-label="Delete note" (click)="onDeleteNote(note.id)">
+                <mat-icon>delete</mat-icon>
               </button>
             </div>
             <button mat-button (click)="onSaveNote(note.id)" class="close-btn">
@@ -186,70 +147,28 @@
         </div>
       </div>
 
-      <!-- Note Color Picker - Below the note card -->
-      <div class="color-picker-popup note-color-picker" 
-           *ngIf="showNoteColorPicker && selectedNoteForColor?.id === note.id" 
-           (click)="$event.stopPropagation()">
+      <div class="color-picker-popup note-color-picker"
+        *ngIf="showNoteColorPicker && selectedNoteForColor?.id === note.id" (click)="$event.stopPropagation()">
         <div class="color-grid">
-          <div class="color-option default-color" 
-               (click)="changeNoteColor(note, '#ffffff')"
-               [class.selected]="note.color === '#ffffff' || !note.color">
+          <div class="color-option default-color" (click)="changeNoteColor(note, '#ffffff')"
+            [class.selected]="note.color === '#ffffff' || !note.color">
             <mat-icon>format_color_reset</mat-icon>
           </div>
-          
-          <div *ngFor="let color of solidColors" 
-               class="color-option" 
-               [style.background-color]="color"
-               (click)="changeNoteColor(note, color)"
-               [class.selected]="note.color === color">
-          </div>
-        </div>
-      </div>
 
-      <!-- More Menu - Below the note card -->
-      <div class="more-menu-popup" 
-           *ngIf="showMoreMenu && selectedNoteForMenu?.id === note.id" 
-           (click)="$event.stopPropagation()">
-        <div class="menu-item" (click)="onDeleteNote(note.id)">
-          <mat-icon>delete</mat-icon>
-          <span>Delete note</span>
-        </div>
-        <div class="menu-item" (click)="addLabel(note)">
-          <mat-icon>label</mat-icon>
-          <span>Add label</span>
-        </div>
-        <div class="menu-item" (click)="addDrawing(note)">
-          <mat-icon>brush</mat-icon>
-          <span>Add drawing</span>
-        </div>
-        <div class="menu-item" (click)="makeCopy(note)">
-          <mat-icon>content_copy</mat-icon>
-          <span>Make a copy</span>
-        </div>
-        <div class="menu-item" (click)="showCheckboxes(note)">
-          <mat-icon>check_box</mat-icon>
-          <span>Show checkboxes</span>
-        </div>
-        <div class="menu-item" (click)="copyToGoogleDocs(note)">
-          <mat-icon>description</mat-icon>
-          <span>Copy to Google Docs</span>
-        </div>
-        <div class="menu-item" (click)="versionHistory(note)">
-          <mat-icon>history</mat-icon>
-          <span>Version history</span>
+          <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
+            (click)="changeNoteColor(note, color)" [class.selected]="note.color === color">
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Empty state -->
-<div class="empty-state" *ngIf="notes.length === 0 && !isLoading">
+<div class="empty-state" *ngIf="activeNotes.length === 0 && !isLoading">
   <mat-icon class="empty-icon">lightbulb</mat-icon>
   <p class="empty-message">Notes you add appear here</p>
 </div>
 
-<!-- Loading state -->
 <div class="loading-state" *ngIf="isLoading">
   <mat-spinner diameter="40"></mat-spinner>
 </div>

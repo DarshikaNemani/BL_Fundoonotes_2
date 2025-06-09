@@ -2,13 +2,11 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
 import { NotesService } from '../../services/notes_service/notes.service';
 
 interface Note {
@@ -16,6 +14,8 @@ interface Note {
   title: string;
   description: string;
   color?: string;
+  isArchived?: boolean;
+  isDeleted?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -23,18 +23,9 @@ interface Note {
 @Component({
   selector: 'app-notes',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [ CommonModule, ReactiveFormsModule, FormsModule, MatIconModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatProgressSpinnerModule ],
   templateUrl: './notes.component.html',
-  styleUrls: ['./notes.component.scss']
+  styleUrls: ['./notes.component.scss'],
 })
 export class NotesComponent implements OnInit, OnDestroy {
   noteForm: FormGroup;
@@ -45,38 +36,34 @@ export class NotesComponent implements OnInit, OnDestroy {
   editTitle = '';
   editDescription = '';
   isLoading = false;
-  
+
   showFormColorPicker = false;
   showNoteColorPicker = false;
   showMoreMenu = false;
   selectedFormColor = '#ffffff';
   selectedNoteForColor: Note | null = null;
   selectedNoteForMenu: Note | null = null;
-  
+
   solidColors = [
     '#f28b82',
-    '#fbbc04',  
+    '#fbbc04',
     '#fff475',
     '#ccff90',
     '#a7ffeb',
     '#cbf0f8',
-    '#aecbfa', 
-    '#d7aefb', 
-    '#fdcfe8', 
-    '#e6c9a8', 
-    '#e8eaed'  
+    '#aecbfa',
+    '#d7aefb',
+    '#fdcfe8',
+    '#e6c9a8',
+    '#e8eaed',
   ];
 
-  
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    private notesService: NotesService
-  ) {
+  constructor(private fb: FormBuilder, private notesService: NotesService) {
     this.noteForm = this.fb.group({
       title: [''],
-      description: ['']
+      description: [''],
     });
   }
 
@@ -87,6 +74,15 @@ export class NotesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // Getter to filter active notes (not archived and not deleted)
+  get activeNotes(): Note[] {
+    return this.notes.filter(
+      (note) =>
+        (note.isArchived === false || note.isArchived === undefined) &&
+        (note.isDeleted === false || note.isDeleted === undefined)
+    );
   }
 
   @HostListener('document:click', ['$event'])
@@ -107,10 +103,11 @@ export class NotesComponent implements OnInit, OnDestroy {
   }
 
   onInputBlur() {
-    if (!this.noteForm.value.title?.trim() && !this.noteForm.value.description?.trim()) {
-      setTimeout(() => {
-        this.isExpanded = false;
-      }, 150);
+    if (
+      !this.noteForm.value.title?.trim() &&
+      !this.noteForm.value.description?.trim()
+    ) {
+      setTimeout(() => (this.isExpanded = false), 150);
     }
   }
 
@@ -146,90 +143,59 @@ export class NotesComponent implements OnInit, OnDestroy {
     note.color = color;
     this.showNoteColorPicker = false;
     this.selectedNoteForColor = null;
-    
+
     if (note.id) {
       this.notesService.updateNoteColor(note.id, color).subscribe({
-        next: () => {
-          console.log('Note color updated');
-        },
-        error: (error) => {
-          console.error('Error updating note color:', error);
-        }
+        next: () => console.log('Note color updated'),
+        error: (error) => console.error('Error updating note color:', error),
       });
     }
   }
 
-  addLabel(note: Note) {
-    console.log('Add label to note:', note.id);
-    this.showMoreMenu = false;
-    this.selectedNoteForMenu = null;
-  }
-
-  addDrawing(note: Note) {
-    console.log('Add drawing to note:', note.id);
-    this.showMoreMenu = false;
-    this.selectedNoteForMenu = null;
-  }
-
-  makeCopy(note: Note) {
-    const newNote: Note = {
-      title: note.title + ' (Copy)',
-      description: note.description,
-      color: note.color
-    };
-    
-    this.notesService.createNote(newNote).subscribe({
+  onArchiveNote(noteId: string) {
+    this.notesService.archiveNote(noteId).subscribe({
       next: () => {
+        console.log('Note archived');
+        this.loadNotes();
+      },
+      error: (error) => console.error('Error archiving note:', error),
+    });
+  }
+
+  onDeleteNote(noteId: string | undefined) {
+    if (!noteId) return;
+
+    this.notesService.deleteNote(noteId).subscribe({
+      next: () => {
+        console.log('Note moved to trash');
         this.loadNotes();
         this.showMoreMenu = false;
         this.selectedNoteForMenu = null;
       },
-      error: (error) => {
-        console.error('Error copying note:', error);
-      }
+      error: (error) => console.error('Error deleting note:', error),
     });
-  }
-
-  showCheckboxes(note: Note) {
-    console.log('Show checkboxes for note:', note.id);
-    this.showMoreMenu = false;
-    this.selectedNoteForMenu = null;
-  }
-
-  copyToGoogleDocs(note: Note) {
-    console.log('Copy to Google Docs:', note.id);
-    this.showMoreMenu = false;
-    this.selectedNoteForMenu = null;
-  }
-
-  versionHistory(note: Note) {
-    console.log('Version history for note:', note.id);
-    this.showMoreMenu = false;
-    this.selectedNoteForMenu = null;
   }
 
   onSubmit() {
     const title = this.noteForm.value.title?.trim();
     const description = this.noteForm.value.description?.trim();
-    
+
     if (title || description) {
       const note: Note = {
         title: title || '',
         description: description || '',
-        color: this.selectedFormColor
+        color: this.selectedFormColor,
       };
-      
-      this.notesService.createNote(note)
+
+      this.notesService
+        .createNote(note)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (response) => {
-            console.log('Note created:', response);
+          next: () => {
             this.loadNotes();
             this.resetForm();
           },
-          error: (error) => {
-            console.error('Error creating note:', error);
-          }
+          error: (error) => console.error('Error creating note:', error),
         });
     } else {
       this.resetForm();
@@ -244,11 +210,11 @@ export class NotesComponent implements OnInit, OnDestroy {
 
   loadNotes() {
     this.isLoading = true;
-    this.notesService.getAllNotes()
+    this.notesService
+      .getAllNotes()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('Notes loaded:', response);
           this.notes = response.data?.data || response.data || [];
           this.isLoading = false;
         },
@@ -256,7 +222,7 @@ export class NotesComponent implements OnInit, OnDestroy {
           console.error('Error loading notes:', error);
           this.notes = [];
           this.isLoading = false;
-        }
+        },
       });
   }
 
@@ -275,19 +241,17 @@ export class NotesComponent implements OnInit, OnDestroy {
 
   onSaveNote(noteId: string | undefined) {
     if (!noteId) return;
-    
+
     const title = this.editTitle.trim();
     const description = this.editDescription.trim();
-    
+
     if (title || description) {
       this.notesService.updateNote(noteId, title, description).subscribe({
         next: () => {
           this.loadNotes();
           this.onCancelEdit();
         },
-        error: (error) => {
-          console.error('Error updating note:', error);
-        }
+        error: (error) => console.error('Error updating note:', error),
       });
     } else {
       this.onCancelEdit();
@@ -299,24 +263,5 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.editNoteId = null;
     this.editTitle = '';
     this.editDescription = '';
-  }
-
-  onDeleteNote(noteId: string | undefined) {
-    if (!noteId) return;
-    
-    this.notesService.deleteNote(noteId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          console.log('Note deleted');
-          this.loadNotes();
-          this.onCancelEdit();
-          this.showMoreMenu = false;
-          this.selectedNoteForMenu = null;
-        },
-        error: (error) => {
-          console.error('Error deleting note:', error);
-        }
-      });
   }
 }
