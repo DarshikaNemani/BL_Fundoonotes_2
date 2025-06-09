@@ -1,6 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,7 +43,8 @@ export class RegisterComponent {
 
   private emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   private nameRegex = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
-  private passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  private passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   constructor(
     private fb: FormBuilder,
@@ -43,17 +52,31 @@ export class RegisterComponent {
     private router: Router,
     private snackBar: MatSnackBar
   ) {
-    this.registerForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.pattern(this.nameRegex)]],
-      lastName: ['', [Validators.required, Validators.pattern(this.nameRegex)]],
-      email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
-      password: ['', [Validators.required, Validators.pattern(this.passwordRegex)]],
-      confirmPassword: ['', Validators.required],
-      service: ['advance']
-    }, { validators: this.passwordMatchValidator });
+    this.registerForm = this.fb.group(
+      {
+        firstName: [
+          '',
+          [Validators.required, Validators.pattern(this.nameRegex)],
+        ],
+        lastName: [
+          '',
+          [Validators.required, Validators.pattern(this.nameRegex)],
+        ],
+        email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
+        password: [
+          '',
+          [Validators.required, Validators.pattern(this.passwordRegex)],
+        ],
+        confirmPassword: ['', Validators.required],
+        service: ['advance'],
+      },
+      { validators: this.passwordMatchValidator }
+    );
   }
 
-  passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  passwordMatchValidator: ValidatorFn = (
+    control: AbstractControl
+  ): ValidationErrors | null => {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
 
@@ -61,7 +84,9 @@ export class RegisterComponent {
       return null;
     }
 
-    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+    return password.value === confirmPassword.value
+      ? null
+      : { passwordMismatch: true };
   };
 
   togglePasswordVisibility() {
@@ -71,53 +96,64 @@ export class RegisterComponent {
   onSubmit() {
     if (this.registerForm.valid) {
       this.isLoading.set(true);
-      
+
       const payload = {
         firstName: this.registerForm.value.firstName,
         lastName: this.registerForm.value.lastName,
         email: this.registerForm.value.email,
         password: this.registerForm.value.password,
-        service: this.registerForm.value.service
+        service: this.registerForm.value.service,
       };
 
       this.userService.signup(payload).subscribe({
         next: (result: any) => {
           console.log('Registration successful:', result);
           this.isLoading.set(false);
-          
-          this.snackBar.open('Registration successful! Please login.', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-          });
-          
+
+          this.snackBar.open(
+            'Registration successful! Please login.',
+            'Close',
+            {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            }
+          );
+
           this.router.navigateByUrl('/login');
         },
         error: (err: any) => {
           console.error('Registration failed:', err);
           this.isLoading.set(false);
-          
-          const errorMessage = err.error?.message || 'Registration failed. Please try again.';
+
+          const errorMessage =
+            err.error?.message || 'Registration failed. Please try again.';
           this.snackBar.open(errorMessage, 'Close', {
             duration: 5000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-        }
+        },
       });
     } else {
       this.registerForm.markAllAsTouched();
-      this.snackBar.open('Please fill all required fields correctly.', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-      });
+      this.snackBar.open(
+        'Please fill all required fields correctly.',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        }
+      );
     }
   }
 
   get passwordMismatch() {
-    return this.registerForm.hasError('passwordMismatch') && 
-           this.registerForm.get('confirmPassword')?.touched;
+    return (
+      this.registerForm.hasError('passwordMismatch') &&
+      this.registerForm.get('confirmPassword')?.touched
+    );
   }
 
   get firstNameError() {
@@ -137,14 +173,16 @@ export class RegisterComponent {
   get emailError() {
     const control = this.registerForm.get('email');
     if (control?.hasError('required')) return 'Email is required';
-    if (control?.hasError('pattern')) return 'Please enter a valid email address';
+    if (control?.hasError('pattern'))
+      return 'Please enter a valid email address';
     return '';
   }
 
   get passwordError() {
     const control = this.registerForm.get('password');
     if (control?.hasError('required')) return 'Password is required';
-    if (control?.hasError('pattern')) return 'Password must contain at least 8 characters with uppercase, lowercase, number and special character';
+    if (control?.hasError('pattern'))
+      return 'Password must contain at least 8 characters with uppercase, lowercase, number and special character';
     return '';
   }
 }

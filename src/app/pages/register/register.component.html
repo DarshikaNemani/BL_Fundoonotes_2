@@ -3,7 +3,7 @@
     <img src="assets/Google_2015_logo.svg.webp" alt="Google" class="google-logo">
     <h2>Create your Google Account</h2>
   </div>
-  
+
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="name-row">
       <mat-form-field appearance="outline">
@@ -12,8 +12,8 @@
         <mat-error *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
           {{ firstNameError }}
         </mat-error>
-      </mat-form-field> 
-      
+      </mat-form-field>
+
       <mat-form-field appearance="outline">
         <mat-label>Last Name</mat-label>
         <input matInput formControlName="lastName">
@@ -22,18 +22,18 @@
         </mat-error>
       </mat-form-field>
     </div>
-    
+
     <div class="email-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email">    
+        <input matInput formControlName="email" type="email">
         <mat-hint>You'll use this email to sign in and recover your account</mat-hint>
         <mat-error *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
           {{ emailError }}
         </mat-error>
       </mat-form-field>
     </div>
-    
+
     <div class="password-row">
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
@@ -42,7 +42,7 @@
           {{ passwordError }}
         </mat-error>
       </mat-form-field>
-      
+
       <mat-form-field appearance="outline">
         <mat-label>Confirm</mat-label>
         <input matInput [type]="hide() ? 'password' : 'text'" formControlName="confirmPassword" />
@@ -54,13 +54,13 @@
         </mat-error>
       </mat-form-field>
     </div>
-    
+
     <div class="checkbox-row">
       <mat-checkbox [checked]="!hide()" (change)="togglePasswordVisibility()">
         Show password
       </mat-checkbox>
     </div>
-    
+
     <div class="submit-row">
       <a routerLink="/login" class="sign-in">Sign in instead</a>
       <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid || isLoading()">
@@ -68,7 +68,7 @@
       </button>
     </div>
   </form>
-  
+
   <div class="side-image">
     <img src="assets/image.png" alt="Google Products" class="products-image">
     <p class="tagline">One account. All of Google working for you.</p>
