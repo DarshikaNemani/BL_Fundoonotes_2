@@ -12,16 +12,7 @@ import { UserService } from '../../services/user_service/user.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    RouterModule,
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatSnackBarModule,
-  ],
+  imports: [RouterModule, CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatSnackBarModule ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,7 +33,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
       password: ['', Validators.required],
-      service: ['advance']
+      service: ['advance'],
     });
   }
 
@@ -69,43 +60,50 @@ export class LoginComponent {
             localStorage.setItem('authToken', result.id);
             if (result) {
               localStorage.setItem('userData', JSON.stringify(result));
-            } 
+            }
           }
-          
+
           this.snackBar.open('Login successful!', 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-          
-          this.router.navigateByUrl('')
+
+          this.router.navigateByUrl('/dashboard');
         },
         error: (err: any) => {
           console.error('Login failed:', err);
           this.isLoading.set(false);
-          
-          const errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
+
+          const errorMessage =
+            err.error?.message ||
+            'Login failed. Please check your credentials.';
           this.snackBar.open(errorMessage, 'Close', {
             duration: 5000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-        }
+        },
       });
     } else {
       this.loginForm.markAllAsTouched();
-      this.snackBar.open('Please fill all required fields correctly.', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-      });
+      this.snackBar.open(
+        'Please fill all required fields correctly.',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        }
+      );
     }
   }
 
   get emailError() {
     const control = this.loginForm.get('email');
     if (control?.hasError('required')) return 'Email is required';
-    if (control?.hasError('pattern')) return 'Please enter a valid email address';
+    if (control?.hasError('pattern'))
+      return 'Please enter a valid email address';
     return '';
   }
 
