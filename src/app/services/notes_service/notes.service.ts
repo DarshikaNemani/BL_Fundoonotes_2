@@ -6,10 +6,11 @@ interface Note {
   id?: string;
   title: string;
   description: string;
+  color?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NotesService {
   constructor(private httpService: HttpService) {}
@@ -30,54 +31,80 @@ export class NotesService {
     return this.httpService.postApi('/notes/addNotes', note);
   }
 
-  updateNote(noteId: string, title: string, description: string): Observable<any> {
-    const formData = new FormData();
-    formData.append('noteId', noteId);
-    formData.append('title', title);
-    formData.append('description', description);
-
-    const headers = this.httpService.getHeaders();
-    headers.delete('Content-Type');
-
-    return this.httpService.postApi('/notes/updateNotes', formData);
-  }
-
-  deleteNote(noteId: string): Observable<any> {
-    return this.httpService.deleteApi(`/notes/trashNotes/${noteId}`);
+  updateNote(
+    noteId: string,
+    title: string,
+    description: string
+  ): Observable<any> {
+    return this.httpService.postFormData(
+      '/notes/updateNotes',
+      this.createFormData({
+        noteId,
+        title,
+        description,
+      })
+    );
   }
 
   archiveNote(noteId: string): Observable<any> {
-    const formData = new FormData();
-    formData.append('noteId', noteId);
-    formData.append('isArchived', 'true');
-
-    return this.httpService.postApi('/notes/archiveNotes', formData);
+    return this.httpService.postApi('/notes/archiveNotes', {
+      noteIdList: [noteId],
+      isArchived: true,
+    });
   }
 
   unarchiveNote(noteId: string): Observable<any> {
-    const formData = new FormData();
-    formData.append('noteId', noteId);
-    formData.append('isArchived', 'false');
+    return this.httpService.postApi('/notes/archiveNotes', {
+      noteIdList: [noteId],
+      isArchived: false,
+    });
+  }
 
-    return this.httpService.postApi('/notes/archiveNotes', formData);
+  deleteNote(noteId: string): Observable<any> {
+    return this.httpService.postApi('/notes/trashNotes', {
+      noteIdList: [noteId],
+      isDeleted: true,
+    });
   }
 
   restoreNote(noteId: string): Observable<any> {
-    return this.httpService.postApi(`/notes/restoreNotes/${noteId}`, {});
+    return this.httpService.postApi('/notes/trashNotes', {
+      noteIdList: [noteId],
+      isDeleted: false,
+    });
   }
 
   deleteNotePermanently(noteId: string): Observable<any> {
     return this.httpService.deleteApi(`/notes/deleteForeverNotes/${noteId}`);
   }
+
   updateNoteColor(noteId: string, color: string): Observable<any> {
-  const formData = new FormData();
-  formData.append('noteId', noteId);
-  formData.append('color', color);
+    return this.httpService.postApi('/notes/changesColorNotes', {
+      noteIdList: [noteId],
+      color,
+    });
+  }
 
-  const headers = this.httpService.getHeaders();
-  headers.delete('Content-Type');
+  // Bulk operations
+  bulkArchive(noteIds: string[], isArchived: boolean): Observable<any> {
+    return this.httpService.postApi('/notes/archiveNotes', {
+      noteIdList: noteIds,
+      isArchived,
+    });
+  }
 
-  return this.httpService.postApi('/notes/updateNoteColor', formData);
-}
+  bulkTrash(noteIds: string[], isDeleted: boolean): Observable<any> {
+    return this.httpService.postApi('/notes/trashNotes', {
+      noteIdList: noteIds,
+      isDeleted,
+    });
+  }
 
+  private createFormData(data: Record<string, any>): FormData {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    return formData;
+  }
 }
