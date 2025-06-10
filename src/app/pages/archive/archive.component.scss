@@ -15,15 +15,25 @@
 .notes-masonry {
   columns: 1;
   column-gap: 16px;
-  
-  @media (min-width: 600px) { columns: 2; }
-  @media (min-width: 900px) { columns: 3; }
-  @media (min-width: 1200px) { columns: 4; }
-  @media (min-width: 1400px) { columns: 5; }
+
+  @media (min-width: 600px) {
+    columns: 2;
+  }
+
+  @media (min-width: 900px) {
+    columns: 3;
+  }
+
+  @media (min-width: 1200px) {
+    columns: 4;
+  }
+
+  @media (min-width: 1400px) {
+    columns: 5;
+  }
 }
 
 .note-card {
-  background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -35,15 +45,15 @@
   flex-direction: column;
   min-height: 120px;
   overflow: hidden;
-  
+
   &:hover {
-    box-shadow: 0 2px 8px rgba(60,64,67,.15);
-    
+    box-shadow: 0 2px 8px rgba(60, 64, 67, .15);
+
     .note-actions-bottom {
       opacity: 1;
     }
   }
-  
+
   &.editing {
     cursor: default;
   }
@@ -54,11 +64,11 @@
   flex-direction: column;
   padding: 16px;
   flex: 1;
-  
+
   .note-body {
     flex: 1;
     margin-bottom: 16px;
-    
+
     .note-title {
       font-size: 16px;
       font-weight: 500;
@@ -67,7 +77,7 @@
       line-height: 1.5;
       word-wrap: break-word;
     }
-    
+
     .note-description {
       font-size: 14px;
       color: #202124;
@@ -85,20 +95,20 @@
   margin-top: auto;
   opacity: 0;
   transition: opacity 0.2s;
-  
+
   .action-btn {
     width: 32px;
     height: 32px;
     color: #5f6368;
-    
+
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
     }
-    
+
     &:hover {
-      background-color: #f1f3f4;
+      background-color: rgba(95, 99, 104, 0.1);
     }
   }
 }
@@ -108,11 +118,11 @@
   flex-direction: column;
   padding: 16px;
   flex: 1;
-  
+
   .edit-body {
     flex: 1;
     margin-bottom: 16px;
-    
+
     .edit-title-input {
       width: 100%;
       border: none;
@@ -122,12 +132,12 @@
       color: #202124;
       background: transparent;
       margin-bottom: 12px;
-      
+
       &::placeholder {
         color: #5f6368;
       }
     }
-    
+
     .edit-description-textarea {
       width: 100%;
       border: none;
@@ -138,7 +148,7 @@
       resize: none;
       font-family: inherit;
       min-height: 60px;
-      
+
       &::placeholder {
         color: #5f6368;
       }
@@ -151,37 +161,37 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  
+
   .edit-action-buttons {
     display: flex;
     gap: 4px;
-    
+
     button {
       color: #5f6368;
       width: 32px;
       height: 32px;
-      
+
       mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
       }
-      
+
       &:hover {
-        background-color: #f1f3f4;
+        background-color: rgba(95, 99, 104, 0.1);
       }
     }
   }
-  
+
   .close-btn {
     color: #5f6368;
     font-weight: 500;
     padding: 8px 16px;
     border-radius: 4px;
     text-transform: none;
-    
+
     &:hover {
-      background-color: #f1f3f4;
+      background-color: rgba(95, 99, 104, 0.1);
     }
   }
 }
@@ -190,7 +200,7 @@
   text-align: center;
   padding: 80px 20px;
   color: #5f6368;
-  
+
   .empty-icon {
     font-size: 120px;
     width: 120px;
@@ -198,7 +208,7 @@
     margin-bottom: 16px;
     opacity: 0.3;
   }
-  
+
   .empty-message {
     font-size: 22px;
     margin: 0;
@@ -216,11 +226,11 @@
   .archive-container {
     padding: 16px 8px;
   }
-  
+
   .notes-masonry {
     columns: 1 !important;
   }
-  
+
   .note-actions-bottom {
     opacity: 1;
   }

@@ -1,25 +1,24 @@
 <div class="archive-container">
   <div class="archive-content">
-    <!-- Archive notes grid -->
     <div class="notes-container" *ngIf="archivedNotes.length > 0">
       <div class="notes-masonry">
-        <div *ngFor="let note of archivedNotes; trackBy: trackByNoteId" 
-             class="note-card" 
-             [class.editing]="isEditing && editNoteId === note.id"
-             (click)="onNoteClick(note)">
-          
-          <!-- Display mode -->
+        <div *ngFor="let note of archivedNotes; trackBy: trackByNoteId" class="note-card"
+          [class.editing]="isEditing && editNoteId === note.id" [style.background-color]="note.color || '#ffffff'"
+          (click)="onNoteClick(note)">
+
           <div *ngIf="!(isEditing && editNoteId === note.id)" class="note-content">
             <div class="note-body">
               <div class="note-title" *ngIf="note.title">{{ note.title }}</div>
               <div class="note-description" *ngIf="note.description">{{ note.description }}</div>
             </div>
-            
+
             <div class="note-actions-bottom">
-              <button mat-icon-button class="action-btn" aria-label="Unarchive" (click)="onUnarchiveNote(note.id); $event.stopPropagation()">
+              <button mat-icon-button class="action-btn" aria-label="Unarchive"
+                (click)="onUnarchiveNote(note.id); $event.stopPropagation()">
                 <mat-icon>unarchive</mat-icon>
               </button>
-              <button mat-icon-button class="action-btn" aria-label="Delete" (click)="onDeleteNote(note.id); $event.stopPropagation()">
+              <button mat-icon-button class="action-btn" aria-label="Delete"
+                (click)="onDeleteNote(note.id); $event.stopPropagation()">
                 <mat-icon>delete</mat-icon>
               </button>
               <button mat-icon-button class="action-btn" aria-label="Color options" (click)="$event.stopPropagation()">
@@ -30,32 +29,22 @@
               </button>
             </div>
           </div>
-          
-          <!-- Edit mode -->
+
           <div *ngIf="isEditing && editNoteId === note.id" class="edit-content" (click)="$event.stopPropagation()">
             <div class="edit-body">
-              <input 
-                [(ngModel)]="editTitle" 
-                placeholder="Title" 
-                class="edit-title-input"
-                type="text"
-                (keydown.enter)="onSaveNote(note.id)"
-                (keydown.escape)="onCancelEdit()">
-              
-              <textarea 
-                [(ngModel)]="editDescription" 
-                placeholder="Take a note..." 
-                class="edit-description-textarea"
-                rows="4"
-                (keydown.escape)="onCancelEdit()"></textarea>
+              <input [(ngModel)]="editTitle" placeholder="Title" class="edit-title-input" type="text"
+                (keydown.enter)="onSaveNote(note.id)" (keydown.escape)="onCancelEdit()">
+
+              <textarea [(ngModel)]="editDescription" placeholder="Take a note..." class="edit-description-textarea"
+                rows="4" (keydown.escape)="onCancelEdit()"></textarea>
             </div>
-            
+
             <div class="edit-actions-bottom">
               <div class="edit-action-buttons">
-                <button type="button" mat-icon-button aria-label="Unarchive">
+                <button type="button" mat-icon-button aria-label="Unarchive" (click)="onUnarchiveNote(note.id)">
                   <mat-icon>unarchive</mat-icon>
                 </button>
-                <button type="button" mat-icon-button aria-label="Delete">
+                <button type="button" mat-icon-button aria-label="Delete" (click)="onDeleteNote(note.id)">
                   <mat-icon>delete</mat-icon>
                 </button>
                 <button type="button" mat-icon-button aria-label="Color options">
@@ -74,13 +63,11 @@
       </div>
     </div>
 
-    <!-- Empty state -->
     <div class="empty-state" *ngIf="archivedNotes.length === 0 && !isLoading">
       <mat-icon class="empty-icon">archive</mat-icon>
       <p class="empty-message">Your archived notes appear here</p>
     </div>
 
-    <!-- Loading state -->
     <div class="loading-state" *ngIf="isLoading">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
