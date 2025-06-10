@@ -12,7 +12,7 @@ interface Note {
 @Injectable({
   providedIn: 'root',
 })
-export class NotesService {
+export class NotesService {     
   constructor(private httpService: HttpService) {}
 
   getAllNotes(): Observable<any> {
