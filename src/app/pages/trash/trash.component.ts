@@ -1,20 +1,16 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
-import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDrawerContainer } from '@angular/material/sidenav';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { NotesService } from '../../services/notes_service/notes.service';
-import { NavbarComponent } from "../../components/navbar/navbar.component";
-import { SidenavComponent } from "../../components/sidenav/sidenav.component";
 
 interface Note {
   id?: string;
   title: string;
   description: string;
+  color?: string;
   isDeleted?: boolean;
 }
 
@@ -26,22 +22,17 @@ interface Note {
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    NavbarComponent,
-    SidenavComponent,
-    MatSidenavModule
-],
+  ],
   templateUrl: './trash.component.html',
-  styleUrls: ['./trash.component.scss']
+  styleUrls: ['./trash.component.scss'],
 })
 export class TrashComponent implements OnInit, OnDestroy {
-   @ViewChild('drawerContainer') drawerContainer!: MatDrawerContainer;
-   
   trashedNotes: Note[] = [];
   isLoading = false;
-  
+
   private destroy$ = new Subject<void>();
 
-  constructor(private notesService: NotesService, private router: Router) {}
+  constructor(private notesService: NotesService) {}
 
   ngOnInit() {
     this.loadTrashedNotes();
@@ -58,7 +49,8 @@ export class TrashComponent implements OnInit, OnDestroy {
 
   loadTrashedNotes() {
     this.isLoading = true;
-    this.notesService.getTrashedNotes()
+    this.notesService
+      .getTrashedNotes()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -69,61 +61,50 @@ export class TrashComponent implements OnInit, OnDestroy {
           console.error('Error loading trashed notes:', error);
           this.trashedNotes = [];
           this.isLoading = false;
-        }
+        },
       });
   }
 
   onNoteClick(note: Note) {
-    //restore/delete actions
-  }
-
-  sidenavCollapsed = false;
-
-  get sidenavWidth() {
-    return this.sidenavCollapsed ? '72px' : '280px';
-  }
-
-  toggleSidenavCollapse() {
-    this.sidenavCollapsed = !this.sidenavCollapsed;
-    
-    setTimeout(() => {
-      this.drawerContainer?.updateContentMargins();
-    }, 300);
-  }
-
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
+    // In trash, clicking doesn't edit - only restore/delete actions
   }
 
   onRestoreNote(noteId: string | undefined) {
     if (!noteId) return;
-    
-    this.notesService.restoreNote(noteId)
+
+    this.notesService
+      .restoreNote(noteId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          console.log('Note restored');
           this.loadTrashedNotes();
         },
         error: (error) => {
           console.error('Error restoring note:', error);
-        }
+        },
       });
   }
 
   onDeleteForever(noteId: string | undefined) {
     if (!noteId) return;
-    
-    if (confirm('This note will be permanently deleted. This action cannot be undone.')) {
-      this.notesService.deleteNotePermanently(noteId)
+
+    if (
+      confirm(
+        'This note will be permanently deleted. This action cannot be undone.'
+      )
+    ) {
+      this.notesService
+        .deleteNotePermanently(noteId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
+            console.log('Note deleted permanently');
             this.loadTrashedNotes();
           },
           error: (error) => {
-            console.error('Error permanently deleting note:', error);
-          }
+            console.error('Error deleting permanently:', error);
+          },
         });
     }
   }
