@@ -4,33 +4,40 @@
   </div>
 
   <div class="trash-content">
-    <div class="notes-container" *ngIf="trashedNotes.length > 0">
-      <div class="notes-masonry">
-        <div *ngFor="let note of trashedNotes; trackBy: trackByNoteId" class="note-card"
-          [style.background-color]="note.color || '#ffffff'" (click)="onNoteClick(note)">
+    <div class="notes-container" *ngIf="filteredNotes.length > 0">
+      <div class="notes-layout" 
+           [class.notes-grid]="isGridView" 
+           [class.notes-list]="isListView">
+        <div *ngFor="let note of filteredNotes; trackBy: trackByNoteId" 
+             class="note-card-wrapper">
+          <div class="note-card" 
+               [class.list-view-card]="isListView"
+               [style.background-color]="note.color || '#ffffff'" 
+               (click)="onNoteClick(note)">
 
-          <div class="note-content">
-            <div class="note-body">
-              <div class="note-title" *ngIf="note.title">{{ note.title }}</div>
-              <div class="note-description" *ngIf="note.description">{{ note.description }}</div>
-            </div>
+            <div class="note-content">
+              <div class="note-body">
+                <div class="note-title" *ngIf="note.title">{{ note.title }}</div>
+                <div class="note-description" *ngIf="note.description">{{ note.description }}</div>
+              </div>
 
-            <div class="note-actions-bottom">
-              <button mat-icon-button class="action-btn" aria-label="Restore"
-                (click)="onRestoreNote(note.id); $event.stopPropagation()">
-                <mat-icon>restore_from_trash</mat-icon>
-              </button>
-              <button mat-icon-button class="action-btn" aria-label="Delete forever"
-                (click)="onDeleteForever(note.id); $event.stopPropagation()">
-                <mat-icon>delete_forever</mat-icon>
-              </button>
+              <div class="note-actions-bottom">
+                <button mat-icon-button class="action-btn" aria-label="Restore"
+                  (click)="onRestoreNote(note.id); $event.stopPropagation()">
+                  <mat-icon>restore_from_trash</mat-icon>
+                </button>
+                <button mat-icon-button class="action-btn" aria-label="Delete forever"
+                  (click)="onDeleteForever(note.id); $event.stopPropagation()">
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="empty-state" *ngIf="trashedNotes.length === 0 && !isLoading">
+    <div class="empty-state" *ngIf="filteredNotes.length === 0 && !isLoading">
       <mat-icon class="empty-icon">delete</mat-icon>
       <p class="empty-message">No notes in Trash</p>
     </div>

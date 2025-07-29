@@ -4,48 +4,74 @@
     <div class="form-input-row" *ngIf="!isExpanded">
       <input formControlName="description" placeholder="Take a note..." class="note-input" type="text"
         (focus)="expandForm()">
-
       <div class="form-icons">
-        <button type="button" mat-icon-button aria-label="New list">
-          <mat-icon>check_box</mat-icon>
-        </button>
-        <button type="button" mat-icon-button aria-label="New drawing">
-          <mat-icon>brush</mat-icon>
-        </button>
-        <button type="button" mat-icon-button aria-label="New image">
-          <mat-icon>image</mat-icon>
-        </button>
+        <button type="button" mat-icon-button aria-label="New list"><mat-icon>check_box</mat-icon></button>
+        <button type="button" mat-icon-button aria-label="New drawing"><mat-icon>brush</mat-icon></button>
+        <button type="button" mat-icon-button aria-label="New image"><mat-icon>image</mat-icon></button>
       </div>
     </div>
 
     <div *ngIf="isExpanded" class="expanded-form">
+      <div class="uhh-container">
       <input formControlName="title" placeholder="Title" class="note-title-input" type="text">
-
-      <textarea formControlName="description" placeholder="Take a note..." class="note-textarea" rows="3"
-        (blur)="onInputBlur()"></textarea>
-
-      <div class="form-footer">
-        <div class="form-actions">
-          <button type="button" mat-icon-button aria-label="Remind me">
-            <mat-icon>add_alert</mat-icon>
-          </button>
-          <button type="button" mat-icon-button aria-label="Collaborator">
-            <mat-icon>person_add</mat-icon>
-          </button>
-          <button type="button" mat-icon-button aria-label="Color options" (click)="toggleFormColorPicker($event)">
-            <mat-icon>palette</mat-icon>
-          </button>
-          <button type="button" mat-icon-button aria-label="Add image">
-            <mat-icon>image</mat-icon>
-          </button>
-          <button type="button" mat-icon-button aria-label="Archive">
-            <mat-icon>archive</mat-icon>
-          </button>
+      <button mat-icon-button type="button" aria-label="Pin note" class="form-pin-btn" (click)="toggleFormPin($event)"
+        [class.pinned]="isFormPinned">
+        <mat-icon>push_pin</mat-icon>
+      </button>
+      </div>
+      <textarea formControlName="description" placeholder="Take a note..." class="note-textarea" cdkTextareaAutosize
+        cdkAutosizeMinRows="3" cdkAutosizeMaxRows="12" (blur)="onInputBlur()"></textarea>
+      <div *ngIf="formReminder" class="form-reminder-display">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ formatReminderDisplay(formReminder) }}</span>
+        <button mat-icon-button type="button" aria-label="Remove reminder" (click)="removeFormReminder($event)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+        <div class="form-footer">
+         <div class="form-actions">
+          <!-- Reminder Button with Dropdown -->
+          <div class="reminder-container">
+            <button type="button" mat-icon-button aria-label="Remind me" 
+                    (click)="toggleFormReminderMenu($event)"
+                    [class.active]="showFormReminderMenu || formReminder">
+              <mat-icon>add_alert</mat-icon>
+            </button>
+            
+            <!-- Reminder Dropdown Menu -->
+            <div class="reminder-menu" *ngIf="showFormReminderMenu" (click)="$event.stopPropagation()">
+              <div class="reminder-header">Remind me</div>
+              <div class="reminder-option" (click)="setFormReminder('later_today')">
+                <span>Later today</span>
+                <span class="reminder-time">8:00 PM</span>
+              </div>
+              <div class="reminder-option" (click)="setFormReminder('tomorrow')">
+                <span>Tomorrow</span>
+                <span class="reminder-time">8:00 AM</span>
+              </div>
+              <div class="reminder-option" (click)="setFormReminder('next_week')">
+                <span>Next week</span>
+                <span class="reminder-time">Mon, 8:00 AM</span>
+              </div>
+              <div class="reminder-separator"></div>
+              <div class="reminder-option" (click)="openCustomDateTimePicker()">
+                <mat-icon>schedule</mat-icon>
+                <span>Pick date & time</span>
+              </div>
+              <div class="reminder-option" (click)="openLocationPicker()">
+                <mat-icon>place</mat-icon>
+                <span>Pick place</span>
+              </div>
+            </div>
+          </div>
+            <button type="button" mat-icon-button aria-label="Collaborator"><mat-icon>person_add</mat-icon></button>
+          <button type="button" mat-icon-button aria-label="Color options"
+            (click)="toggleFormColorPicker($event)"><mat-icon>palette</mat-icon></button>
+          <button type="button" mat-icon-button aria-label="Add image"><mat-icon>image</mat-icon></button>
+          <button type="button" mat-icon-button aria-label="Archive"><mat-icon>archive</mat-icon></button>
         </div>
         <button type="submit" mat-button class="close-btn"
-          [disabled]="!noteForm.value.title?.trim() && !noteForm.value.description?.trim()">
-          Close
-        </button>
+          [disabled]="!noteForm.value.title?.trim() && !noteForm.value.description?.trim()">Close</button>
       </div>
     </div>
   </form>
@@ -57,106 +83,415 @@
         [class.selected]="selectedFormColor === '#ffffff'">
         <mat-icon>format_color_reset</mat-icon>
       </div>
-
       <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
-        (click)="selectFormColor(color)" [class.selected]="selectedFormColor === color">
-      </div>
+        (click)="selectFormColor(color)" [class.selected]="selectedFormColor === color"></div>
     </div>
   </div>
 </div>
 
-<!-- Notes grid -->
-<div class="notes-container" *ngIf="activeNotes.length > 0">
-  <div class="notes-masonry">
-    <div *ngFor="let note of activeNotes; trackBy: trackByNoteId" class="note-card-wrapper"
-      [class.has-color-picker]="showNoteColorPicker && selectedNoteForColor?.id === note.id">
+<!-- Notes container -->
+<div class="notes-container" *ngIf="filteredNotes.length > 0">
 
-      <div class="note-card" [class.editing]="isEditing && editNoteId === note.id"
-        [style.background-color]="note.color || '#ffffff'" (click)="onNoteClick(note)">
+  <!-- PINNED NOTES SECTION -->
+  <div *ngIf="pinnedNotes.length > 0" class="note-section">
+    <div class="note-section-heading" *ngIf="otherNotes.length > 0">PINNED</div>
+    <div class="notes-layout" [class.notes-grid]="isGridView" [class.notes-list]="isListView">
+      <div *ngFor="let note of pinnedNotes; trackBy: trackByNoteId" class="note-card-wrapper"
+        [class.has-color-picker]="showNoteColorPicker && selectedNoteForColor?.id === note.id"
+        (click)="$event.stopPropagation()">
 
-        <div *ngIf="!(isEditing && editNoteId === note.id)" class="note-content">
-          <div class="note-body">
-            <div class="note-header" *ngIf="note.title">
-              <h3 class="note-title">{{ note.title }}</h3>
+        <div class="note-card" [class.editing]="isEditing && editNoteId === note.id" [class.list-view-card]="isListView"
+          [style.background-color]="note.color || '#ffffff'" (click)="onNoteClick(note)">
+
+          <div *ngIf="!(isEditing && editNoteId === note.id)" class="note-content">
+            <div class="note-body">
+              <div class="note-header" *ngIf="note.title">
+                <h3 class="note-title">{{ note.title }}</h3>
+
+                <!-- PIN BUTTON -->
+                <button mat-icon-button class="pin-icon" aria-label="Pin note" (click)="toggleNotePin($event, note)"
+                  [class.pinned]="note.isPined">
+                  <mat-icon>push_pin</mat-icon>
+                </button>
+              </div>
+
+              <!-- PIN BUTTON FOR NOTES WITHOUT TITLE -->
+              <div class="note-header-no-title" *ngIf="!note.title">
+                <button mat-icon-button class="pin-icon" aria-label="Pin note" (click)="toggleNotePin($event, note)"
+                  [class.pinned]="note.isPined">
+                  <mat-icon>push_pin</mat-icon>
+                </button>
+              </div>
+
+              <div class="note-description" *ngIf="note.description">
+                {{ note.description }}
+              </div>
+              <div *ngIf="note.reminders && note.reminders.length > 0" class="note-reminder-display">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ formatNoteReminderDisplay(note.reminders[0]) }}</span>
+              </div>
             </div>
-            <div class="note-description" *ngIf="note.description">
-              {{ note.description }}
-            </div>
-          </div>
 
-          <div class="note-actions-bottom">
-            <button mat-icon-button class="action-btn" aria-label="Remind me" (click)="$event.stopPropagation()">
-              <mat-icon>add_alert</mat-icon>
-            </button>
-            <button mat-icon-button class="action-btn" aria-label="Collaborator" (click)="$event.stopPropagation()">
-              <mat-icon>person_add</mat-icon>
-            </button>
-            <button mat-icon-button class="action-btn" aria-label="Color options"
-              (click)="toggleNoteColorPicker($event, note)">
-              <mat-icon>palette</mat-icon>
-            </button>
-            <button mat-icon-button class="action-btn" aria-label="Add image" (click)="$event.stopPropagation()">
-              <mat-icon>image</mat-icon>
-            </button>
-            <button mat-icon-button class="action-btn" aria-label="Archive"
-              (click)="onArchiveNote(note.id!); $event.stopPropagation()">
-              <mat-icon>archive</mat-icon>
-            </button>
-            <button mat-icon-button class="action-btn" aria-label="Delete note"
-              (click)="onDeleteNote(note.id); $event.stopPropagation()">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-
-        <div *ngIf="isEditing && editNoteId === note.id" class="edit-content" (click)="$event.stopPropagation()">
-          <div class="edit-body">
-            <input [(ngModel)]="editTitle" placeholder="Title" class="edit-title-input" type="text"
-              (keydown.enter)="onSaveNote(note.id)" (keydown.escape)="onCancelEdit()">
-
-            <textarea [(ngModel)]="editDescription" placeholder="Take a note..." class="edit-description-textarea"
-              rows="4" (keydown.escape)="onCancelEdit()"></textarea>
-          </div>
-
-          <div class="edit-actions-bottom">
-            <div class="edit-action-buttons">
-              <button type="button" mat-icon-button aria-label="Remind me">
-                <mat-icon>add_alert</mat-icon>
-              </button>
-              <button type="button" mat-icon-button aria-label="Collaborator">
-                <mat-icon>person_add</mat-icon>
-              </button>
-              <button type="button" mat-icon-button aria-label="Color options"
+            <div class="note-actions-bottom">
+              <button mat-icon-button class="action-btn" aria-label="Color options"
                 (click)="toggleNoteColorPicker($event, note)">
                 <mat-icon>palette</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="Add image">
+              <div class="reminder-container">
+                <button mat-icon-button class="action-btn" aria-label="Remind me"
+                        (click)="toggleNoteReminderMenu($event, note)"
+                        [class.active]="note.reminders && note.reminders.length > 0">
+                  <mat-icon>add_alert</mat-icon>
+                </button>
+                
+                <!-- Note Reminder Dropdown -->
+                <div class="reminder-menu" *ngIf="showNoteReminderMenu && selectedNoteForReminder?.id === note.id" 
+                     (click)="$event.stopPropagation()">
+                  <div class="reminder-header">Remind me</div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'later_today')">
+                    <span>Later today</span>
+                    <span class="reminder-time">8:00 PM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'tomorrow')">
+                    <span>Tomorrow</span>
+                    <span class="reminder-time">8:00 AM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'next_week')">
+                    <span>Next week</span>
+                    <span class="reminder-time">Mon, 8:00 AM</span>
+                  </div>
+                  <div class="reminder-separator"></div>
+                  <div class="reminder-option" (click)="openNoteCustomDateTimePicker(note)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Pick date & time</span>
+                  </div>
+                  <div class="reminder-option" (click)="openNoteLocationPicker(note)">
+                    <mat-icon>place</mat-icon>
+                    <span>Pick place</span>
+                  </div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" class="reminder-separator"></div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" 
+                       class="reminder-option reminder-remove" (click)="removeNoteReminder(note)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Remove reminder</span>
+                  </div>
+                </div>
+              </div>
+
+              <button mat-icon-button class="action-btn" aria-label="Collaborator" (click)="$event.stopPropagation()">
+                <mat-icon>person_add</mat-icon>
+              </button>
+              <button mat-icon-button class="action-btn" aria-label="Add image" (click)="$event.stopPropagation()">
                 <mat-icon>image</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="Archive" (click)="onArchiveNote(note.id!)">
+              <button mat-icon-button class="action-btn" aria-label="Archive"
+                (click)="onArchiveNote(note.id!); $event.stopPropagation()">
                 <mat-icon>archive</mat-icon>
               </button>
-              <button type="button" mat-icon-button aria-label="Delete note" (click)="onDeleteNote(note.id)">
-                <mat-icon>delete</mat-icon>
+              <button mat-icon-button class="action-btn" aria-label="Delete note"
+                (click)="toggleMoreMenu($event, note); $event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
               </button>
             </div>
-            <button mat-button (click)="onSaveNote(note.id)" class="close-btn">
-              Close
-            </button>
+
+            <div class="dropdown-menu" *ngIf="showMoreMenu && selectedNoteForMenu?.id === note.id"
+              (click)="$event.stopPropagation()">
+              <div class="dropdown-item" (click)="onDeleteNote(note.id)">Delete note</div>
+              <div class="dropdown-item">Add label</div>
+              <div class="dropdown-item">Add drawing</div>
+              <div class="dropdown-item" (click)="makeCopy(note)">Make a copy</div>
+              <div class="dropdown-item">Show checkboxes</div>
+              <div class="dropdown-item">Copy to Google Docs</div>
+              <div class="dropdown-item">Version history</div>
+            </div>
+          </div>
+
+          <div *ngIf="isEditing && editNoteId === note.id" class="edit-content" (click)="$event.stopPropagation()">
+            <div class="edit-body">
+              <input [(ngModel)]="editTitle" placeholder="Title" class="edit-title-input" type="text"
+                (keydown.enter)="onSaveNote(note.id)" (keydown.escape)="onCancelEdit()">
+
+              <textarea [(ngModel)]="editDescription" placeholder="Take a note..." class="edit-description-textarea"
+                [style.height]="editTextareaHeight" (input)="adjustEditTextareaHeight($event)"
+                (keydown.escape)="onCancelEdit()"></textarea>
+            </div>
+
+            <div class="edit-actions-bottom">
+              <div class="edit-action-buttons">
+                              <div class="reminder-container">
+                <button mat-icon-button class="action-btn" aria-label="Remind me"
+                        (click)="toggleNoteReminderMenu($event, note)"
+                        [class.active]="note.reminders && note.reminders.length > 0">
+                  <mat-icon>add_alert</mat-icon>
+                </button>
+                
+                <!-- Note Reminder Dropdown -->
+                <div class="reminder-menu" *ngIf="showNoteReminderMenu && selectedNoteForReminder?.id === note.id" 
+                     (click)="$event.stopPropagation()">
+                  <div class="reminder-header">Remind me</div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'later_today')">
+                    <span>Later today</span>
+                    <span class="reminder-time">8:00 PM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'tomorrow')">
+                    <span>Tomorrow</span>
+                    <span class="reminder-time">8:00 AM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'next_week')">
+                    <span>Next week</span>
+                    <span class="reminder-time">Mon, 8:00 AM</span>
+                  </div>
+                  <div class="reminder-separator"></div>
+                  <div class="reminder-option" (click)="openNoteCustomDateTimePicker(note)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Pick date & time</span>
+                  </div>
+                  <div class="reminder-option" (click)="openNoteLocationPicker(note)">
+                    <mat-icon>place</mat-icon>
+                    <span>Pick place</span>
+                  </div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" class="reminder-separator"></div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" 
+                       class="reminder-option reminder-remove" (click)="removeNoteReminder(note)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Remove reminder</span>
+                  </div>
+                </div>
+              </div>
+
+                <button type="button" mat-icon-button aria-label="Collaborator">
+                  <mat-icon>person_add</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Color options"
+                  (click)="toggleNoteColorPicker($event, note)">
+                  <mat-icon>palette</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Add image">
+                  <mat-icon>image</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Archive" (click)="onArchiveNote(note.id!)">
+                  <mat-icon>archive</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Delete note" (click)="onDeleteNote(note.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="color-picker-popup note-color-picker"
+          *ngIf="showNoteColorPicker && selectedNoteForColor?.id === note.id" (click)="$event.stopPropagation()">
+          <div class="color-grid">
+            <div class="color-option default-color" (click)="changeNoteColor(note, '#ffffff')"
+              [class.selected]="note.color === '#ffffff' || !note.color">
+              <mat-icon>format_color_reset</mat-icon>
+            </div>
+
+            <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
+              (click)="changeNoteColor(note, color)" [class.selected]="note.color === color">
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="color-picker-popup note-color-picker"
-        *ngIf="showNoteColorPicker && selectedNoteForColor?.id === note.id" (click)="$event.stopPropagation()">
-        <div class="color-grid">
-          <div class="color-option default-color" (click)="changeNoteColor(note, '#ffffff')"
-            [class.selected]="note.color === '#ffffff' || !note.color">
-            <mat-icon>format_color_reset</mat-icon>
+  <!-- OTHER NOTES SECTION -->
+  <div *ngIf="otherNotes.length > 0" class="note-section">
+    <div class="note-section-heading" *ngIf="pinnedNotes.length > 0">OTHERS</div>
+    <div class="notes-layout" [class.notes-grid]="isGridView" [class.notes-list]="isListView">
+      <div *ngFor="let note of otherNotes; trackBy: trackByNoteId" class="note-card-wrapper"
+        [class.has-color-picker]="showNoteColorPicker && selectedNoteForColor?.id === note.id"
+        (click)="$event.stopPropagation()">
+
+        <div class="note-card" [class.editing]="isEditing && editNoteId === note.id" [class.list-view-card]="isListView"
+          [style.background-color]="note.color || '#ffffff'" (click)="onNoteClick(note)">
+
+          <div *ngIf="!(isEditing && editNoteId === note.id)" class="note-content">
+            <div class="note-body">
+              <div class="note-header" *ngIf="note.title">
+                <h3 class="note-title">{{ note.title }}</h3>
+
+                <!-- PIN BUTTON -->
+                <button mat-icon-button class="pin-icon" aria-label="Pin note" (click)="toggleNotePin($event, note)"
+                  [class.pinned]="note.isPined">
+                  <mat-icon>push_pin</mat-icon>
+                </button>
+              </div>
+
+              <!-- PIN BUTTON FOR NOTES WITHOUT TITLE -->
+              <div class="note-header-no-title" *ngIf="!note.title">
+                <button mat-icon-button class="pin-icon" aria-label="Pin note" (click)="toggleNotePin($event, note)"
+                  [class.pinned]="note.isPined">
+                  <mat-icon>push_pin</mat-icon>
+                </button>
+              </div>
+
+              <div class="note-description" *ngIf="note.description">
+                {{ note.description }}
+              </div>
+            </div>
+
+            <div class="note-actions-bottom">
+              <button mat-icon-button class="action-btn" aria-label="Color options"
+                (click)="toggleNoteColorPicker($event, note)">
+                <mat-icon>palette</mat-icon>
+              </button>
+                            <div class="reminder-container">
+                <button mat-icon-button class="action-btn" aria-label="Remind me"
+                        (click)="toggleNoteReminderMenu($event, note)"
+                        [class.active]="note.reminders && note.reminders.length > 0">
+                  <mat-icon>add_alert</mat-icon>
+                </button>
+                
+                <!-- Note Reminder Dropdown -->
+                <div class="reminder-menu" *ngIf="showNoteReminderMenu && selectedNoteForReminder?.id === note.id" 
+                     (click)="$event.stopPropagation()">
+                  <div class="reminder-header">Remind me</div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'later_today')">
+                    <span>Later today</span>
+                    <span class="reminder-time">8:00 PM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'tomorrow')">
+                    <span>Tomorrow</span>
+                    <span class="reminder-time">8:00 AM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'next_week')">
+                    <span>Next week</span>
+                    <span class="reminder-time">Mon, 8:00 AM</span>
+                  </div>
+                  <div class="reminder-separator"></div>
+                  <div class="reminder-option" (click)="openNoteCustomDateTimePicker(note)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Pick date & time</span>
+                  </div>
+                  <div class="reminder-option" (click)="openNoteLocationPicker(note)">
+                    <mat-icon>place</mat-icon>
+                    <span>Pick place</span>
+                  </div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" class="reminder-separator"></div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" 
+                       class="reminder-option reminder-remove" (click)="removeNoteReminder(note)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Remove reminder</span>
+                  </div>
+                </div>
+              </div>
+
+              <button mat-icon-button class="action-btn" aria-label="Collaborator" (click)="$event.stopPropagation()">
+                <mat-icon>person_add</mat-icon>
+              </button>
+              <button mat-icon-button class="action-btn" aria-label="Add image" (click)="$event.stopPropagation()">
+                <mat-icon>image</mat-icon>
+              </button>
+              <button mat-icon-button class="action-btn" aria-label="Archive"
+                (click)="onArchiveNote(note.id!); $event.stopPropagation()">
+                <mat-icon>archive</mat-icon>
+              </button>
+              <button mat-icon-button class="action-btn" aria-label="Delete note"
+                (click)="toggleMoreMenu($event, note); $event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </div>
+
+            <div class="dropdown-menu" *ngIf="showMoreMenu && selectedNoteForMenu?.id === note.id"
+              (click)="$event.stopPropagation()">
+              <div class="dropdown-item" (click)="onDeleteNote(note.id)">Delete note</div>
+              <div class="dropdown-item">Add label</div>
+              <div class="dropdown-item">Add drawing</div>
+              <div class="dropdown-item" (click)="makeCopy(note)">Make a copy</div>
+              <div class="dropdown-item">Show checkboxes</div>
+              <div class="dropdown-item">Copy to Google Docs</div>
+              <div class="dropdown-item">Version history</div>
+            </div>
           </div>
 
-          <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
-            (click)="changeNoteColor(note, color)" [class.selected]="note.color === color">
+          <div *ngIf="isEditing && editNoteId === note.id" class="edit-content" (click)="$event.stopPropagation()">
+            <div class="edit-body">
+              <input [(ngModel)]="editTitle" placeholder="Title" class="edit-title-input" type="text"
+                (keydown.enter)="onSaveNote(note.id)" (keydown.escape)="onCancelEdit()">
+
+              <textarea [(ngModel)]="editDescription" placeholder="Take a note..." class="edit-description-textarea"
+                [style.height]="editTextareaHeight" (input)="adjustEditTextareaHeight($event)"
+                (keydown.escape)="onCancelEdit()"></textarea>
+            </div>
+
+            <div class="edit-actions-bottom">
+              <div class="edit-action-buttons">
+                              <div class="reminder-container">
+                <button mat-icon-button class="action-btn" aria-label="Remind me"
+                        (click)="toggleNoteReminderMenu($event, note)"
+                        [class.active]="note.reminders && note.reminders.length > 0">
+                  <mat-icon>add_alert</mat-icon>
+                </button>
+                
+                <!-- Note Reminder Dropdown -->
+                <div class="reminder-menu" *ngIf="showNoteReminderMenu && selectedNoteForReminder?.id === note.id" 
+                     (click)="$event.stopPropagation()">
+                  <div class="reminder-header">Remind me</div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'later_today')">
+                    <span>Later today</span>
+                    <span class="reminder-time">8:00 PM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'tomorrow')">
+                    <span>Tomorrow</span>
+                    <span class="reminder-time">8:00 AM</span>
+                  </div>
+                  <div class="reminder-option" (click)="setNoteReminder(note, 'next_week')">
+                    <span>Next week</span>
+                    <span class="reminder-time">Mon, 8:00 AM</span>
+                  </div>
+                  <div class="reminder-separator"></div>
+                  <div class="reminder-option" (click)="openNoteCustomDateTimePicker(note)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Pick date & time</span>
+                  </div>
+                  <div class="reminder-option" (click)="openNoteLocationPicker(note)">
+                    <mat-icon>place</mat-icon>
+                    <span>Pick place</span>
+                  </div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" class="reminder-separator"></div>
+                  <div *ngIf="note.reminders && note.reminders.length > 0" 
+                       class="reminder-option reminder-remove" (click)="removeNoteReminder(note)">
+                    <mat-icon>delete</mat-icon>
+                    <span>Remove reminder</span>
+                  </div>
+                </div>
+              </div>
+
+                <button type="button" mat-icon-button aria-label="Collaborator">
+                  <mat-icon>person_add</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Color options"
+                  (click)="toggleNoteColorPicker($event, note)">
+                  <mat-icon>palette</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Add image">
+                  <mat-icon>image</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Archive" (click)="onArchiveNote(note.id!)">
+                  <mat-icon>archive</mat-icon>
+                </button>
+                <button type="button" mat-icon-button aria-label="Delete note" (click)="onDeleteNote(note.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="color-picker-popup note-color-picker"
+          *ngIf="showNoteColorPicker && selectedNoteForColor?.id === note.id" (click)="$event.stopPropagation()">
+          <div class="color-grid">
+            <div class="color-option default-color" (click)="changeNoteColor(note, '#ffffff')"
+              [class.selected]="note.color === '#ffffff' || !note.color">
+              <mat-icon>format_color_reset</mat-icon>
+            </div>
+
+            <div *ngFor="let color of solidColors" class="color-option" [style.background-color]="color"
+              (click)="changeNoteColor(note, color)" [class.selected]="note.color === color">
+            </div>
           </div>
         </div>
       </div>
@@ -164,9 +499,11 @@
   </div>
 </div>
 
-<div class="empty-state" *ngIf="activeNotes.length === 0 && !isLoading">
+<div class="empty-state" *ngIf="filteredNotes.length === 0 && !isLoading">
   <mat-icon class="empty-icon">lightbulb</mat-icon>
-  <p class="empty-message">Notes you add appear here</p>
+  <p class="empty-message">
+    {{ searchTerm ? 'No notes found' : 'Notes you add appear here' }}
+  </p>
 </div>
 
 <div class="loading-state" *ngIf="isLoading">

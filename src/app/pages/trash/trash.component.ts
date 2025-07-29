@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotesService } from '../../services/notes_service/notes.service';
+import { ViewService, ViewMode } from '../../services/view_service/view.service';
+import { SearchService } from 'src/app/services/search_service/search.service';
 
 interface Note {
   id?: string;
@@ -30,12 +32,28 @@ export class TrashComponent implements OnInit, OnDestroy {
   trashedNotes: Note[] = [];
   isLoading = false;
 
-  private destroy$ = new Subject<void>();
+  currentViewMode: ViewMode = 'grid';
 
-  constructor(private notesService: NotesService) {}
+  private destroy$ = new Subject<void>();
+  searchTerm: string = '';
+
+  constructor(
+    private notesService: NotesService,
+    private viewService: ViewService,
+    private searchService: SearchService
+  ) {}
 
   ngOnInit() {
     this.loadTrashedNotes();
+    
+    this.viewService.viewMode$.pipe(takeUntil(this.destroy$)).subscribe(mode => {
+      this.currentViewMode = mode;
+    });
+              this.searchService.searchTerm$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.searchTerm = term.trim().toLowerCase();
+      });
   }
 
   ngOnDestroy() {
@@ -43,10 +61,26 @@ export class TrashComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get isListView(): boolean {
+    return this.currentViewMode === 'list';
+  }
+
+  get isGridView(): boolean {
+    return this.currentViewMode === 'grid';
+  }
+
   trackByNoteId(index: number, note: Note): string {
     return note.id || index.toString();
   }
-
+  get filteredNotes(): Note[] {
+    if (!this.searchTerm) return this.trashedNotes;
+    return this.trashedNotes.filter(
+      (note) =>
+        (note.title && note.title.toLowerCase().includes(this.searchTerm)) ||
+        (note.description &&
+          note.description.toLowerCase().includes(this.searchTerm))
+    );
+  }
   loadTrashedNotes() {
     this.isLoading = true;
     this.notesService
@@ -66,7 +100,6 @@ export class TrashComponent implements OnInit, OnDestroy {
   }
 
   onNoteClick(note: Note) {
-    // In trash, clicking doesn't edit - only restore/delete actions
   }
 
   onRestoreNote(noteId: string | undefined) {

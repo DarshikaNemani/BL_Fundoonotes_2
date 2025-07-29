@@ -2,7 +2,7 @@
   (mouseleave)="clearHover()">
   <ng-container *ngFor="let item of navItems">
     <button mat-button class="sidebar-btn" [class.active]="selectedLabel === item.label" [routerLink]="item.route"
-      routerLinkActive="active" (click)="select(item.label)">
+      routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="select(item.label)">
       <mat-icon>{{ item.icon }}</mat-icon>
       <span *ngIf="isExpanded || isHovering">{{ item.label }}</span>
     </button>

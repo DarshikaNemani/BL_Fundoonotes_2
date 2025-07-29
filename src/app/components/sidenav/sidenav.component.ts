@@ -14,11 +14,11 @@ import { RouterModule } from '@angular/router';
 export class SidenavComponent {
   @Input() isExpanded: boolean = false;
   selectedLabel: string = '';
-  isHovering: boolean = false; // Changed from hoverLabel to boolean
+  isHovering: boolean = false;
 
   navItems = [
     { icon: 'lightbulb', label: 'Notes', route: '/dashboard' },
-    { icon: 'notifications', label: 'Reminders', route: '/reminders' },
+    { icon: 'notifications', label: 'Reminders', route: '/dashboard/reminders' },
     { icon: 'edit', label: 'Edit labels', route: '/edit-labels' },
     { icon: 'archive', label: 'Archive', route: '/dashboard/archive' },
     { icon: 'delete', label: 'Trash', route: '/dashboard/trash' },

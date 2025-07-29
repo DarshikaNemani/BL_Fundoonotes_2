@@ -6,6 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotesService } from '../../services/notes_service/notes.service';
+import {
+  ViewService,
+  ViewMode,
+} from '../../services/view_service/view.service';
+import { SearchService } from 'src/app/services/search_service/search.service';
 
 interface Note {
   id?: string;
@@ -18,7 +23,13 @@ interface Note {
 @Component({
   selector: 'app-archive',
   standalone: true,
-  imports: [ CommonModule, FormsModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './archive.component.html',
   styleUrls: ['./archive.component.scss'],
 })
@@ -29,18 +40,42 @@ export class ArchiveComponent implements OnInit, OnDestroy {
   editTitle = '';
   editDescription = '';
   isLoading = false;
+  searchTerm: string = '';
+  currentViewMode: ViewMode = 'grid';
 
   private destroy$ = new Subject<void>();
 
-  constructor(private notesService: NotesService) {}
+  constructor(
+    private notesService: NotesService,
+    private viewService: ViewService,
+    private searchService: SearchService
+  ) {}
 
   ngOnInit() {
     this.loadArchivedNotes();
+    this.viewService.viewMode$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mode) => {
+        this.currentViewMode = mode;
+      });
+    this.searchService.searchTerm$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((term) => {
+        this.searchTerm = term.trim().toLowerCase();
+      });
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  get isListView(): boolean {
+    return this.currentViewMode === 'list';
+  }
+
+  get isGridView(): boolean {
+    return this.currentViewMode === 'grid';
   }
 
   trackByNoteId(index: number, note: Note): string {
@@ -106,7 +141,15 @@ export class ArchiveComponent implements OnInit, OnDestroy {
     this.editTitle = '';
     this.editDescription = '';
   }
-
+  get filteredNotes(): Note[] {
+    if (!this.searchTerm) return this.archivedNotes;
+    return this.archivedNotes.filter(
+      (note) =>
+        (note.title && note.title.toLowerCase().includes(this.searchTerm)) ||
+        (note.description &&
+          note.description.toLowerCase().includes(this.searchTerm))
+    );
+  }
   onUnarchiveNote(noteId: string | undefined) {
     if (!noteId) return;
 

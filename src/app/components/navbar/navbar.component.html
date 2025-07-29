@@ -5,15 +5,21 @@
 
   <div class="navbar-brand">
     <img src="assets/images-keep.png" alt="Keep Logo" class="navbar-logo" />
-    <span class="navbar-title">Fundoonotes</span>
+    <span class="navbar-title">{{ navbarTitle }}</span>
   </div>
 
-  <div class="navbar-search">
-    <div class="search-container">
-      <mat-icon class="search-icon">search</mat-icon>
-      <input type="text" placeholder="Search" class="search-input">
-    </div>
+<div class="navbar-search">
+  <div class="search-container">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      type="text"
+      placeholder="Search"
+      class="search-input"
+      [value]="searchValue"
+      (input)="onSearchInput($event)"
+    >
   </div>
+</div>
 
   <span class="navbar-spacer"></span>
 
@@ -22,8 +28,11 @@
       <mat-icon>refresh</mat-icon>
     </button>
 
-    <button mat-icon-button aria-label="List View">
-      <mat-icon>view_list</mat-icon>
+    <button mat-icon-button 
+            [attr.aria-label]="viewToggleLabel"
+            (click)="toggleViewMode()"
+            class="view-toggle-btn">
+      <mat-icon>{{ viewToggleIcon }}</mat-icon>
     </button>
 
     <button mat-icon-button aria-label="Settings">

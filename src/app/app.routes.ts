@@ -6,6 +6,7 @@ import { ArchiveComponent } from './pages/archive/archive.component';
 import { TrashComponent } from './pages/trash/trash.component';
 import { AuthGuardService } from './services/authGuard_service/auth-guard.service';
 import { NotesComponent } from './components/notes/notes.component';
+import { RemindersComponent } from './pages/reminders/reminders.component';
 
 export const routes: Routes = [
   {
@@ -20,16 +21,12 @@ export const routes: Routes = [
     path: 'dashboard',
     component: HomeComponent,
     canActivate: [AuthGuardService],
+    data: { title: 'Fundoonotes' },
     children: [
-      { path: '', component: NotesComponent },
-      {
-        path: 'archive',
-        component: ArchiveComponent,
-      },
-      {
-        path: 'trash',
-        component: TrashComponent,
-      },
+      { path: '', component: NotesComponent, data: { title: 'Fundoonotes' } },
+      { path: 'reminders', component: RemindersComponent, data: { title: 'Reminders' } },
+      { path: 'archive', component: ArchiveComponent, data: { title: 'Archive' } },
+      { path: 'trash', component: TrashComponent, data: { title: 'Trash' } },
     ],
   },
   {

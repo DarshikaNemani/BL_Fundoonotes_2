@@ -1,5 +1,5 @@
 <div class="home-layout">
-  <app-navbar (toggleSidenav)="toggleSidenavCollapse()" (logout)="logout()">
+  <app-navbar (toggleSidenav)="toggleSidenavCollapse()" (logout)="logout()" (refreshNotes)="onRefreshNotes()">
   </app-navbar>
 
   <mat-drawer-container #drawerContainer class="example-container" autosize>
