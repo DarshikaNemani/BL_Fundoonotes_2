@@ -12,16 +12,7 @@ import { UserService } from '../../services/user_service/user.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    RouterModule,
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatSnackBarModule,
-  ],
+  imports: [RouterModule, CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatSnackBarModule ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +22,6 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = signal(false);
 
-  // Regex patterns
   private emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   constructor(
@@ -43,7 +33,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
       password: ['', Validators.required],
-      service: ['advance'] // Default service type for FundooNotes
+      service: ['advance'],
     });
   }
 
@@ -65,51 +55,55 @@ export class LoginComponent {
         next: (result: any) => {
           console.log('Login successful:', result);
           this.isLoading.set(false);
-          
-          // Store auth token and user data
-          if (result.data) {
-            localStorage.setItem('authToken', result.data);
-            if (result.userData) {
-              localStorage.setItem('userData', JSON.stringify(result.userData));
+
+          if (result.id) {
+            localStorage.setItem('authToken', result.id);
+            if (result) {
+              localStorage.setItem('userData', JSON.stringify(result));
             }
           }
-          
+
           this.snackBar.open('Login successful!', 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-          
-          // Navigate to dashboard/notes
-          this.router.navigateByUrl('/dashboard/notes');
+
+          this.router.navigateByUrl('/dashboard');
         },
         error: (err: any) => {
           console.error('Login failed:', err);
           this.isLoading.set(false);
-          
-          const errorMessage = err.error?.message || 'Login failed. Please check your credentials.';
+
+          const errorMessage =
+            err.error?.message ||
+            'Login failed. Please check your credentials.';
           this.snackBar.open(errorMessage, 'Close', {
             duration: 5000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
           });
-        }
+        },
       });
     } else {
       this.loginForm.markAllAsTouched();
-      this.snackBar.open('Please fill all required fields correctly.', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-      });
+      this.snackBar.open(
+        'Please fill all required fields correctly.',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+        }
+      );
     }
   }
 
-  // Getter methods for form validation errors
   get emailError() {
     const control = this.loginForm.get('email');
     if (control?.hasError('required')) return 'Email is required';
-    if (control?.hasError('pattern')) return 'Please enter a valid email address';
+    if (control?.hasError('pattern'))
+      return 'Please enter a valid email address';
     return '';
   }
 

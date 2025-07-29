@@ -3,35 +3,50 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HttpService {
-  baseUrl = "https://fundoonotes.incubation.bridgelabz.com/api";
-  
-  constructor(private http: HttpClient) { }
+  private baseUrl = 'https://fundoonotes.incubation.bridgelabz.com/api';
+
+  constructor(private http: HttpClient) {}
 
   getHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken') || '';
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': token
+      Authorization: token,
+    });
+  }
+  //Basic CRUD operations
+  getApi(endpoint: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}${endpoint}`, {
+      headers: this.getHeaders(),
     });
   }
 
-  // CRUD operations
-  getApi(endpoint: string, headers: HttpHeaders = this.getHeaders()): Observable<any> {
-    return this.http.get(this.baseUrl + endpoint, { headers });
+  postApi(endpoint: string, payload: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}${endpoint}`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
-  postApi(endpoint: string, payload: any, headers: HttpHeaders = this.getHeaders()): Observable<any> {
-    return this.http.post(this.baseUrl + endpoint, payload, { headers });
+  putApi(endpoint: string, payload: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}${endpoint}`, payload, {
+      headers: this.getHeaders(),
+    });
   }
 
-  putApi(endpoint: string, payload: any, headers: HttpHeaders = this.getHeaders()): Observable<any> {
-    return this.http.put(this.baseUrl + endpoint, payload, { headers });
+  deleteApi(endpoint: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}${endpoint}`, {
+      headers: this.getHeaders(),
+    });
   }
 
-  deleteApi(endpoint: string, headers: HttpHeaders = this.getHeaders()): Observable<any> {
-    return this.http.delete(this.baseUrl + endpoint, { headers });
+  postFormData(endpoint: string, formData: FormData): Observable<any> {
+    const token = localStorage.getItem('authToken') || '';
+    const headers = new HttpHeaders({
+      Authorization: token,
+    });
+    return this.http.post(`${this.baseUrl}${endpoint}`, formData, { headers });
   }
 }
